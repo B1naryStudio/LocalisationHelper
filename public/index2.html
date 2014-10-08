@@ -3,99 +3,25 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<link rel="stylesheet" href="css/main.css" />
 	<link rel="stylesheet" href="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.min.css" />
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-	<style>
-		body, html {
-			height: 100%;
-			width: 100%;
-		}
-
-		#login-form {
-			width: 400px;
-			height: 200px;
-			position: absolute;
-			margin: auto;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			box-shadow: 0px 0px 15px 0px #000
-		}
-
-		#sp-key {
-			width: 300px;
-			height: 100px;
-			padding: 50px;
-		}
-
-		#sp-key-value {
-			width: 100%;
-			height: 30px;
-			font-size: 11px;
-		}
-
-		#sp-key-ok {
-			width: 70px;
-			height: 30px;
-			float: right;
-			margin-top: 30px;
-			cursor: pointer;
-		}
-
-		#container {
-			width: 80%;
-			height: 95%;
-			margin: auto;
-			padding-top: 5%;
-			/*display: none;*/
-		}
-
-		.worksheet {
-			height: 50px;
-			width: 100%;
-			display: none;
-			cursor: pointer;
-		}
-
-		.worksheet:hover {
-			background: rgba(0,0,0,0.1);
-		}
-
-		#worksheets {
-			width: 30%;
-			float: left;
-			height: 100%;
-		}
-
-		#data {
-			width: 70%;
-			float: left;
-			height: 100%;	
-		}
-
-		.translation-item {
-			padding: 10px;
-			margin: 4px;
-			cursor: pointer;
-			box-shadow: 0px 0px 5px 0px #000;
-		}
-
-		.translation-item:hover {
-			box-shadow: 0px 0px 5px 1px #1961CC;
-		}
-
-		#translation-content {
-			height: 100%;
-		}
-	</style>
 </head>
 <body>
 <!-- <button id="generateFiles">Generate Files</button> -->
 <div id="container">
+	<div id="data-controls-panel">
+		<div id="language-controls">
+			<input type="text" id="language-search">
+		</div>
+		<div id="localisation-controls">
+			<label for="localisation-changed-only">Show changed only</label>
+			<input type="checkbox" id="localisation-changed-only">
+			<input type="text" id="localisation-search">
+		</div>
+	</div>
 	<div id="worksheets"></div>
 	<div id="data">
-		
 	</div>
 	<!-- <textarea id="response" name="response" id="" cols="30" rows="10"></textarea> -->
 </div>
@@ -113,6 +39,12 @@
 		var worksheetsTemplate = $('#worksheet-template');
 		var translationItemTemplate = $('#translation-item-template');
 		var $data = $('#data');
+		$('#language-search').on('change', function() {
+			
+		});
+		$('#localisation-controls').on('change', function() {
+
+		});
 		$('#worksheets').on('click', '.worksheet', function() {
 			var item = $(this);
 			var url = item.find('.worksheet-url').html();
