@@ -9,10 +9,7 @@ var dbHelper = require('./dbHelper');
 
 var staticDir = __dirname + '/public';
 
-// 'localisationimportservice@gmail.com', 'localisationaccesskey123123'
-
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
-// app.use(express.errorHandler({ dumpExceptions: true }));
 app.use(express.static(staticDir));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())

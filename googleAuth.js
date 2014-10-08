@@ -17,7 +17,6 @@ GoogleAuth.prototype.generateAuthLink = function(req) {
 	var url = 'https://accounts.google.com/o/oauth2/auth?scope=' + this.scopes + 
 			'&client_id=' + this.clientId + 
 			'&redirect_uri=' + redirectUrl +
-			'&login_hint=localisationimportservice@gmail.com' +
 			'&response_type=code' + 
 			'&access_type=offline';
 
