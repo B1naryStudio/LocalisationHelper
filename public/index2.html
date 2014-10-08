@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.min.css" />
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<style>
+		body, html {
+			height: 100%;
+			width: 100%;
+		}
+
+		#login-form {
+			width: 400px;
+			height: 200px;
+			position: absolute;
+			margin: auto;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			box-shadow: 0px 0px 15px 0px #000
+		}
+
+		#sp-key {
+			width: 300px;
+			height: 100px;
+			padding: 50px;
+		}
+
+		#sp-key-value {
+			width: 100%;
+			height: 30px;
+			font-size: 11px;
+		}
+
+		#sp-key-ok {
+			width: 70px;
+			height: 30px;
+			float: right;
+			margin-top: 30px;
+			cursor: pointer;
+		}
+
+		#container {
+			width: 80%;
+			height: 95%;
+			margin: auto;
+			padding-top: 5%;
+			/*display: none;*/
+		}
+
+		.worksheet {
+			height: 50px;
+			width: 100%;
+			display: none;
+			cursor: pointer;
+		}
+
+		.worksheet:hover {
+			background: rgba(0,0,0,0.1);
+		}
+
+		#worksheets {
+			width: 30%;
+			float: left;
+			height: 100%;
+		}
+
+		#data {
+			width: 70%;
+			float: left;
+			height: 100%;	
+		}
+
+		.translation-item {
+			padding: 10px;
+			margin: 4px;
+			cursor: pointer;
+			box-shadow: 0px 0px 5px 0px #000;
+		}
+
+		.translation-item:hover {
+			box-shadow: 0px 0px 5px 1px #1961CC;
+		}
+
+		#translation-content {
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+<!-- <button id="generateFiles">Generate Files</button> -->
+<div id="container">
+	<div id="worksheets"></div>
+	<div id="data">
+		
+	</div>
+	<!-- <textarea id="response" name="response" id="" cols="30" rows="10"></textarea> -->
+</div>
+<div id="login-form">
+	<div id="sp-key">
+		<input id="sp-key-value" type="text" placeholder="Enter spreadsheet key" value="1U23Aw8HXe82Kbn3AqLZB0ryUcGtVpIatoZQowzl0aho" />
+		<button id="sp-key-ok">Ok</button>
+	</div>	
+</div>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+<script src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var worksheetsTemplate = $('#worksheet-template');
+		var translationItemTemplate = $('#translation-item-template');
+		var $data = $('#data');
+		$('#worksheets').on('click', '.worksheet', function() {
+			var item = $(this);
+			var url = item.find('.worksheet-url').html();
+			var container = $('<div>').attr('id', 'translation-content');
+			$.get('/worksheet', {url: url}, function(result) {
+				result.forEach(function(item) {
+					var translationItem = translationItemTemplate.tmpl(item);
+					container.append(translationItem);
+				});
+				$data.html(container);
+				container.mCustomScrollbar({
+					theme: 'dark-3',
+					scrollButtons: { enable: true },
+					updateOnContentResize: true,
+					advanced: { updateOnSelectorChange: "true" },
+					scrollInertia: 0
+				});
+			});
+		});
+		$('#sp-key-ok').click(function() {
+			var key = $('#sp-key-value').val();
+			$.get('/worksheets', {key: key}, function(list) {
+				var $worksheets = $('#worksheets');
+				var $loginForm = $('#login-form');
+				var $container = $('#container');
+				$loginForm.fadeOut();
+				$container.show();
+				$worksheets.html('');
+				list.forEach(function(item) {
+					var $worksheet = worksheetsTemplate.tmpl(item);
+					$worksheets.append($worksheet);
+					$worksheet.fadeIn();
+				});
+				$('#worksheets').mCustomScrollbar({
+					theme: 'dark-3',
+					scrollButtons: { enable: true },
+					updateOnContentResize: true,
+					advanced: { updateOnSelectorChange: "true" },
+					scrollInertia: 0
+				});
+			});
+		});
+		$('#data').on('click', '.translation-item', function() {
+			$(this).find('.translation-translation > span').focus();
+		});
+	});
+</script>
+<script id="worksheet-template" type="text/x-jQuery-tmpl">
+	<div class="worksheet">
+		<div class="worksheet-name">${name}</div>
+		<div class="worksheet-lang">${lang}</div>
+		<div class="worksheet-url" style="display: none;">${link}</div>
+	</div>
+</script>
+<script id="translation-item-template" type="text/x-jQuery-tmpl">
+	<div class="translation-item">
+		<div class="translation-key" title="Localisation Key"><i class="fa fa-key"></i>&nbsp;{key}</div>
+		<div class="translation-translation" title="Translation"><i class="fa fa-refresh"></i>&nbsp;<span contentEditable="true">${translation}</span></div>
+		<div class="translation-original" title="Original (English) value"><i class="fa fa-home"></i>&nbsp;${originalValue}</div>
+	</div>
+</script>
+<!--script type="text/javascript">
+	function loadClient() {
+		console.log('inside loadClient function');
+		var token = gapi.auth.getToken().access_token;
+		var urlLocation = '1U23Aw8HXe82Kbn3AqLZB0ryUcGtVpIatoZQowzl0aho'; //Get this from the URL of your Spreadsheet in the normal interface for Google Drive.
+
+		//This gives a spitout of ALL spreadsheets that the user has access to.
+		var url = 'https://spreadsheets.google.com/feeds/spreadsheets/private/full?access_token=' + token;
+
+		//This gives a list of all worksheets inside the Spreadsheet, does not give actual data
+		var url = 'https://spreadsheets.google.com/feeds/worksheets/' + urlLocation + '/private/full?access_token=' + token;
+
+		//This gives the data in a list view - change the word list to cells to work from a cell view and see https://developers.google.com/google-apps/spreadsheets/#working_with_cell-based_feeds for details
+		var url = 'https://spreadsheets.google.com/feeds/list/' + urlLocation + '/od6/private/full?access_token=' + token;
+
+		console.log(url);
+		$.get(url, function(data) {
+			console.log(data);
+		});
+	}
+
+</script>-->
+</body>
+</html>
