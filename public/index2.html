@@ -21,9 +21,7 @@
 		</div>
 	</div>
 	<div id="worksheets"></div>
-	<div id="data">
-	</div>
-	<!-- <textarea id="response" name="response" id="" cols="30" rows="10"></textarea> -->
+	<div id="data"></div>
 </div>
 <div id="login-form">
 	<div id="sp-key">
@@ -33,18 +31,53 @@
 </div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+<script type="text/javascript" src="lib/underscore.js"></script>
 <script src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		var worksheetsTemplate = $('#worksheet-template');
 		var translationItemTemplate = $('#translation-item-template');
 		var $data = $('#data');
-		$('#language-search').on('change', function() {
-			
+		var $worksheets = $('#worksheets');
+		$('#localisation-changed-only').click(function() {
+			var value = $(this).is(':checked');
+			var items = $data.find('.translation-item');
+			if(!value) {
+				items.fadeIn();
+			} else {
+				items.hide();
+				$data.find('.translation-item.changed').fadeIn();
+			}
 		});
-		$('#localisation-controls').on('change', function() {
+		$('#language-search').on('keyup', _.debounce(function() {
+			var value = $(this).val();
+			var items = $worksheets.find('.worksheet');
+			if(!value) {
+				items.show();
+				return;
+			}
+			items.hide();
+			items.filter(function(index, item) {
+				return $(item).find('.worksheet-name').text().indexOf(value) > -1 ||
+						$(item).find('.worksheet-lang').text().indexOf(value) > -1;
 
-		});
+			}).fadeIn();
+		}, 200));
+		$('#localisation-search').on('keyup', _.debounce(function() {
+			var value = $(this).val();
+			var items = $data.find('.translation-item');
+			if(!value) {
+				items.show();
+				return;
+			}
+			items.hide();
+			items.filter(function(index, item) {
+				return $(item).find('.translation-key').text().indexOf(value) > -1 ||
+						$(item).find('.translation-value').text().indexOf(value) > -1 ||
+						$(item).find('.translation-original').text().indexOf(value) > -1;
+
+			}).fadeIn();			
+		}, 200));
 		$('#worksheets').on('click', '.worksheet', function() {
 			var item = $(this);
 			var url = item.find('.worksheet-url').html();
@@ -87,8 +120,27 @@
 				});
 			});
 		});
+		$('#data').on('click', '.translation-apply', function() {
+			var $translationItemContainer = $(this).closest('.translation-item');
+			var $textContainer = $translationItemContainer.find('translation-value-text');
+			// send update request
+		});
+		$('#data').on('click', '.translation-cancel', function() {
+			var $translationItemContainer = $(this).closest('.translation-item');
+			var $textContainer = $translationItemContainer.find('translation-value-text');
+			var defaultText = $textContainer.data('default');
+			$translationItemContainer.toggleClass('changed', false);
+			$textContainer.text(defaultText);
+		});
+		$('#data').on('keyup', '.translation-value-text', function() {
+			var $textContainer = $(this);
+			var $translationItemContainer = $textContainer.closest('.translation-item');
+			var defaultValue = $textContainer.data('default');
+			var isChanged = defaultValue !== $textContainer.text();
+			$translationItemContainer.toggleClass('changed', isChanged);
+		});
 		$('#data').on('click', '.translation-item', function() {
-			$(this).find('.translation-translation > span').focus();
+			$(this).find('.translation-value > span').focus();
 		});
 	});
 </script>
@@ -102,31 +154,13 @@
 <script id="translation-item-template" type="text/x-jQuery-tmpl">
 	<div class="translation-item">
 		<div class="translation-key" title="Localisation Key"><i class="fa fa-key"></i>&nbsp;${key}</div>
-		<div class="translation-translation" title="Translation"><i class="fa fa-refresh"></i>&nbsp;<span contentEditable="true">${translation}</span></div>
+		<div class="translation-value" title="Translation"><i class="fa fa-refresh"></i>&nbsp;<span class="translation-value-text" contentEditable="true" data-default="${translation}">${translation}</span></div>
 		<div class="translation-original" title="Original (English) value"><i class="fa fa-home"></i>&nbsp;${originalValue}</div>
+		<div class="translation-buttons-section">
+			<div class="translation-apply"><i class="fa fa-check"></i></div>
+			<div class="translation-cancel"><i class="fa fa-times"></i></div>
+		</div>
 	</div>
 </script>
-<!--script type="text/javascript">
-	function loadClient() {
-		console.log('inside loadClient function');
-		var token = gapi.auth.getToken().access_token;
-		var urlLocation = '1U23Aw8HXe82Kbn3AqLZB0ryUcGtVpIatoZQowzl0aho'; //Get this from the URL of your Spreadsheet in the normal interface for Google Drive.
-
-		//This gives a spitout of ALL spreadsheets that the user has access to.
-		var url = 'https://spreadsheets.google.com/feeds/spreadsheets/private/full?access_token=' + token;
-
-		//This gives a list of all worksheets inside the Spreadsheet, does not give actual data
-		var url = 'https://spreadsheets.google.com/feeds/worksheets/' + urlLocation + '/private/full?access_token=' + token;
-
-		//This gives the data in a list view - change the word list to cells to work from a cell view and see https://developers.google.com/google-apps/spreadsheets/#working_with_cell-based_feeds for details
-		var url = 'https://spreadsheets.google.com/feeds/list/' + urlLocation + '/od6/private/full?access_token=' + token;
-
-		console.log(url);
-		$.get(url, function(data) {
-			console.log(data);
-		});
-	}
-
-</script>-->
 </body>
 </html>

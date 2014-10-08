@@ -1,6 +1,8 @@
 body, html {
 	height: 100%;
 	width: 100%;
+	padding: 0;
+	margin: 0;
 }
 
 #login-form {
@@ -83,7 +85,7 @@ input:focus {
 	width: 80%;
 	height: 95%;
 	margin: auto;
-	padding-top: 5%;
+	padding-top: 2%;
 	display: none;
 }
 
@@ -111,10 +113,48 @@ input:focus {
 }
 
 .translation-item {
+	position: relative;
 	padding: 10px;
 	margin: 4px;
 	cursor: pointer;
 	box-shadow: 0px 0px 5px 0px #000;
+}
+
+.translation-item.changed {
+	background: rgba(255,0,0,0.3);
+}
+
+.translation-item .translation-buttons-section {
+	display: none;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.translation-buttons-section div{
+	width: 25px;
+	height: 25px;
+	float: left;
+	padding: 3px;
+	font-size: 25px;
+	text-align: center;
+	line-height: 25px;
+	-webkit-transition: color 0.18s linear;
+	-moz-transition: color 0.18s linear;
+	-o-transition: color 0.18s linear;
+	-ms-transition: color 0.18s linear;
+	transition: color 0.18s linear;
+}
+
+.translation-apply:hover {
+	color: green;
+}
+.translation-cancel:hover {
+	color: red;
+}
+
+.translation-item.changed .translation-buttons-section {
+	display: block;
 }
 
 .translation-item:hover {
