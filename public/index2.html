@@ -120,6 +120,14 @@
 				});
 			});
 		});
+		$('#data').on('click', '.translation-history', function() {
+			var item = $(this).closest('.translation-item').data('item');
+			if(item) {
+				$.get('/history', {item: item}, function(list) {
+
+				});
+			}
+		});
 		$('#data').on('click', '.translation-apply', function() {
 			var $translationItemContainer = $(this).closest('.translation-item');
 			var $textContainer = $translationItemContainer.find('.translation-value-text');
@@ -152,9 +160,9 @@
 	</div>
 </script>
 <script id="translation-item-template" type="text/x-jQuery-tmpl">
-	<div class="translation-item">
+	<div class="translation-item" data-item="${JSON.stringify($data)}">
 		<div class="translation-buttons-section">
-			<div class="translation-details"><i class="fa fa-database"></i></div>
+			<div class="translation-history"><i class="fa fa-database"></i></div>
 			<div class="translation-actions">
 				<div class="translation-apply"><i class="fa fa-check"></i></div>
 				<div class="translation-cancel"><i class="fa fa-times"></i></div>

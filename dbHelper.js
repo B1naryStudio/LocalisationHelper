@@ -29,6 +29,14 @@ DbHelper.prototype.insertLocalisation = function(records) {
 	}
 };
 
+DbHelper.prototype.getLocalisationHistory = function(localisation, callback) {
+	this.db.collection('localisation')
+		.find({lang: localisation.lang, key: localisation.key})
+		.toArray(function(err, docs) {
+			callback(docs);
+		});
+};
+
 DbHelper.prototype.getLatestLocalisation = function(callback) {
 	var localisation = this.db.collection('localisation');
 	var result = localisation.group(

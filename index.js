@@ -43,6 +43,13 @@ app.get('/post', function(req, res) {
 	});
 });
 
+app.get('/history', function(req, res) {
+	var item = req.query.item;
+	dbHelper.getLocalisationHistory(item, function(result) {
+		res.json(result);
+	});
+});
+
 app.get('/latest', function(req, res) {
 	dbHelper.getLatestLocalisation(function(result) {
 		res.json(result);

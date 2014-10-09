@@ -140,7 +140,7 @@ input:focus {
 	display: block;
 }
 
-.translation-buttons-section .translation-details,
+.translation-buttons-section .translation-history,
 .translation-buttons-section .translation-apply,
 .translation-buttons-section .translation-cancel {
 	width: 25px;
@@ -163,7 +163,7 @@ input:focus {
 .translation-cancel:hover {
 	color: red;
 }
-.translation-details:hover {
+.translation-history:hover {
 	color: blue;
 }
 
