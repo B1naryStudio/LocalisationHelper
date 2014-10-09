@@ -122,12 +122,12 @@
 		});
 		$('#data').on('click', '.translation-apply', function() {
 			var $translationItemContainer = $(this).closest('.translation-item');
-			var $textContainer = $translationItemContainer.find('translation-value-text');
+			var $textContainer = $translationItemContainer.find('.translation-value-text');
 			// send update request
 		});
 		$('#data').on('click', '.translation-cancel', function() {
 			var $translationItemContainer = $(this).closest('.translation-item');
-			var $textContainer = $translationItemContainer.find('translation-value-text');
+			var $textContainer = $translationItemContainer.find('.translation-value-text');
 			var defaultText = $textContainer.data('default');
 			$translationItemContainer.toggleClass('changed', false);
 			$textContainer.text(defaultText);
@@ -153,13 +153,16 @@
 </script>
 <script id="translation-item-template" type="text/x-jQuery-tmpl">
 	<div class="translation-item">
+		<div class="translation-buttons-section">
+			<div class="translation-details"><i class="fa fa-database"></i></div>
+			<div class="translation-actions">
+				<div class="translation-apply"><i class="fa fa-check"></i></div>
+				<div class="translation-cancel"><i class="fa fa-times"></i></div>
+			</div>
+		</div>
 		<div class="translation-key" title="Localisation Key"><i class="fa fa-key"></i>&nbsp;${key}</div>
 		<div class="translation-value" title="Translation"><i class="fa fa-refresh"></i>&nbsp;<span class="translation-value-text" contentEditable="true" data-default="${translation}">${translation}</span></div>
 		<div class="translation-original" title="Original (English) value"><i class="fa fa-home"></i>&nbsp;${originalValue}</div>
-		<div class="translation-buttons-section">
-			<div class="translation-apply"><i class="fa fa-check"></i></div>
-			<div class="translation-cancel"><i class="fa fa-times"></i></div>
-		</div>
 	</div>
 </script>
 </body>

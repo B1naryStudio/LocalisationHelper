@@ -120,18 +120,29 @@ input:focus {
 	box-shadow: 0px 0px 5px 0px #000;
 }
 
+.translation-item .translation-buttons-section {
+	overflow: hidden;
+}
+
 .translation-item.changed {
 	background: rgba(255,0,0,0.3);
 }
 
-.translation-item .translation-buttons-section {
+.translation-item .translation-actions{
 	display: none;
 	position: absolute;
 	top: 0;
 	right: 0;
+	padding: 4px;
 }
 
-.translation-buttons-section div{
+.translation-item.changed .translation-actions {
+	display: block;
+}
+
+.translation-buttons-section .translation-details,
+.translation-buttons-section .translation-apply,
+.translation-buttons-section .translation-cancel {
 	width: 25px;
 	height: 25px;
 	float: left;
@@ -152,9 +163,8 @@ input:focus {
 .translation-cancel:hover {
 	color: red;
 }
-
-.translation-item.changed .translation-buttons-section {
-	display: block;
+.translation-details:hover {
+	color: blue;
 }
 
 .translation-item:hover {
