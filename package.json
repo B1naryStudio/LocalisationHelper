@@ -18,5 +18,9 @@
     "mongodb": "^1.4.17",
     "request": "^2.44.0",
     "underscore": "^1.7.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.8",
+    "gulp-jade": "^0.8.0"
   }
 }
