@@ -23,11 +23,26 @@
 	<div id="worksheets"></div>
 	<div id="data"></div>
 </div>
-<div id="login-form">
-	<div id="sp-key">
-		<input id="sp-key-value" type="text" placeholder="Enter spreadsheet key" value="1U23Aw8HXe82Kbn3AqLZB0ryUcGtVpIatoZQowzl0aho" />
-		<button id="sp-key-ok">Ok</button>
-	</div>	
+<div id="popup" class="visible">
+	<ul class="source-list">
+		<li>
+			<textarea readonly="" class="html-code"></textarea>
+			<textarea readonly="" class="css-code"></textarea>
+		</li>
+		<li id="login-form">
+			<div>
+				<div id="sp-key">
+					<input id="sp-key-value" type="text" placeholder="Enter spreadsheet key" value="1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s" />
+					<button id="sp-key-ok">Ok</button>
+				</div>	
+			</div>	
+		</li>
+		<li id="spinner">
+			<div>
+				<div class="loader"></div>
+			</div>			
+		</li>
+	</ul>
 </div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
@@ -39,6 +54,14 @@
 		var translationItemTemplate = $('#translation-item-template');
 		var $data = $('#data');
 		var $worksheets = $('#worksheets');
+		var $worksheets = $('#worksheets');
+		var $loginForm = $('#login-form');
+		var $spinner = $('#spinner');
+		var $popup = $('#popup');
+		var $container = $('#container');
+		setTimeout(function(){
+			$loginForm.toggleClass('visible', true);
+		}, 400);
 		$('#localisation-changed-only').click(function() {
 			var value = $(this).is(':checked');
 			var items = $data.find('.translation-item');
@@ -82,7 +105,9 @@
 			var item = $(this);
 			var url = item.find('.worksheet-url').html();
 			var container = $('<div>').attr('id', 'translation-content');
+			$popup.toggleClass('visible', true);
 			$.get('/worksheet', {url: url}, function(result) {
+				$popup.toggleClass('visible', false);
 				result.forEach(function(item) {
 					var translationItem = translationItemTemplate.tmpl(item);
 					container.append(translationItem);
@@ -99,11 +124,10 @@
 		});
 		$('#sp-key-ok').click(function() {
 			var key = $('#sp-key-value').val();
+			$spinner.toggleClass('visible', true);
+			$loginForm.toggleClass('visible', false);
 			$.get('/worksheets', {key: key}, function(list) {
-				var $worksheets = $('#worksheets');
-				var $loginForm = $('#login-form');
-				var $container = $('#container');
-				$loginForm.fadeOut();
+				$popup.toggleClass('visible', false);
 				$container.show();
 				$worksheets.html('');
 				list.forEach(function(item) {
@@ -124,7 +148,7 @@
 			var item = $(this).closest('.translation-item').data('item');
 			if(item) {
 				$.get('/history', {item: item}, function(list) {
-
+					console.log(list);
 				});
 			}
 		});

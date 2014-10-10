@@ -69,35 +69,35 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation) {
 		_.each(csb, function(item) {
 			csbContent[item.key] = item.translation;
 		});
-		fs.writeFile('localisation/vis/soccer/' + lang + '.json', JSON.stringify(visContent.soccer), function(err) {
+		fs.writeFile('localisation/vis/soccer/' + lang + '.json', JSON.stringify(visContent.soccer, null, 4), function(err) {
 			if(err) {
 				console.log(err);
 			} else {
 				console.log(lang + '.json was updated.');
 			}
 		});
-		fs.writeFile('localisation/vis/basketball/' + lang + '.json', JSON.stringify(visContent.basketball), function(err) {
+		fs.writeFile('localisation/vis/basketball/' + lang + '.json', JSON.stringify(visContent.basketball, null, 4), function(err) {
 			if(err) {
 				console.log(err);
 			} else {
 				console.log(lang + '.json was updated.');
 			}
 		});
-		fs.writeFile('localisation/vis/icehockey/' + lang + '.json', JSON.stringify(visContent.icehockey), function(err) {
+		fs.writeFile('localisation/vis/icehockey/' + lang + '.json', JSON.stringify(visContent.icehockey, null, 4), function(err) {
 			if(err) {
 				console.log(err);
 			} else {
 				console.log(lang + '.json was updated.');
 			}
 		});
-		fs.writeFile('localisation/vis/volleyball/' + lang + '.json', JSON.stringify(visContent.volleyball), function(err) {
+		fs.writeFile('localisation/vis/volleyball/' + lang + '.json', JSON.stringify(visContent.volleyball, null, 4), function(err) {
 			if(err) {
 				console.log(err);
 			} else {
 				console.log(lang + '.json was updated.');
 			}
 		});
-		fs.writeFile('localisation/csb/' + lang + '.json', JSON.stringify(csbContent), function(err) {
+		fs.writeFile('localisation/csb/' + lang + '.json', JSON.stringify(csbContent, null, 4), function(err) {
 			if(err) {
 				console.log(err);
 			} else {
