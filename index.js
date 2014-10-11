@@ -11,7 +11,7 @@ var staticDir = __dirname + '/public';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 // app.set('view options', {
@@ -77,6 +77,13 @@ app.get('/worksheet', function(req, res) {
 	var url = req.query.url;
 	spreadsheetsHelper.getWorksheetJson(url, function(err, result) {
 		res.json(result);
+	});
+});
+
+app.post('/update', function(req, res) {
+	var item = req.body.item;
+	spreadsheetsHelper.updateCell(item, function() {
+		res.json('ok');
 	});
 });
 

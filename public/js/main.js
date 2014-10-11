@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	var worksheetsTemplate = $('#worksheet-template');
 	var translationItemTemplate = $('#translation-item-template');
+	var historyItemTemplate = $('#history-translation-item-template');
 	var $data = $('#data');
 	var $worksheets = $('#worksheets');
 	var $worksheets = $('#worksheets');
@@ -8,6 +9,8 @@ $(document).ready(function() {
 	var $spinner = $('#spinner');
 	var $popup = $('#popup');
 	var $container = $('#container');
+	var $history = $('#history');
+	var $historyItems = $('#history-items');
 	setTimeout(function(){
 		$loginForm.toggleClass('visible', true);
 	}, 400);
@@ -93,18 +96,46 @@ $(document).ready(function() {
 			});
 		});
 	});
+	$('#close-button').click(function() {
+		$popup.toggleClass('visible', false);
+		$history.toggleClass('visible', false);
+		$historyItems.html('');
+		$historyItems.removeAttr('class');
+	});
+	$('#history-items').on('click', '.history-translation-item', function() {
+		var newTranslation = $(this).find('.history-translation-value').text();
+		// TODO update value
+	});
 	$('#data').on('click', '.translation-history', function() {
 		var item = $(this).closest('.translation-item').data('item');
+		$popup.toggleClass('visible', true);
 		if(item) {
 			$.get('/history', {item: item}, function(list) {
-				console.log(list);
+				var header = $('<div>').text('History for lang: ' + item.lang + ' key: ' + item.key);
+				$historyItems.append(header);
+				list.forEach(function(item) {
+					var $historyItem = historyItemTemplate.tmpl(item);
+					$historyItems.append($historyItem);
+				});
+				$historyItems.mCustomScrollbar({
+					theme: 'dark-3',
+					scrollButtons: { enable: true },
+					updateOnContentResize: true,
+					advanced: { updateOnSelectorChange: "true" },
+					scrollInertia: 0
+				});
+				$history.toggleClass('visible', true);
 			});
 		}
 	});
 	$('#data').on('click', '.translation-apply', function() {
 		var $translationItemContainer = $(this).closest('.translation-item');
 		var $textContainer = $translationItemContainer.find('.translation-value-text');
-		// send update request
+		var initialData = $translationItemContainer.data('item');
+		initialData.translation = $textContainer.text();
+		$.post('/update', {item: initialData}, function(res) {
+			alert(res);
+		});
 	});
 	$('#data').on('click', '.translation-cancel', function() {
 		var $translationItemContainer = $(this).closest('.translation-item');

@@ -18,9 +18,6 @@ html(lang="en")
 			#data
 		#popup.visible
 			ul.source-list
-				li
-					textarea.html-code(readonly='')
-					textarea.css-code(readonly='')
 				li#login-form
 					div
 						#sp-key
@@ -29,10 +26,17 @@ html(lang="en")
 				li#spinner
 					div
 						.loader
+				li#history
+					div#history-items
+					div#close-button-container
+						button#close-button
+							i.fa.fa-arrow-left Back
+
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
 		script(type="text/javascript", src="lib/underscore.js")
 		script(type="text/javascript", src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js")
 		script(type="text/javascript", src="js/main.js")
+		include templates/history-translation-item-template
 		include templates/translation-item-template
 		include templates/worksheet-template

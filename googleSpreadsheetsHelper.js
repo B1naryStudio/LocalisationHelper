@@ -13,14 +13,39 @@ function parseLocalisationList(entries, lang) {
 	var result = [];
 	_.each(entries, function(item) {
 		result.push({
+			id: item.id.$t,
 			lang: lang,
+			context: item.gsx$context.$t,
 			project: item.gsx$project.$t,
 			originalValue: item.gsx$originalvalue.$t,
 			key: item.gsx$key.$t,
-			translation: item.gsx$translation.$t
+			translation: item.gsx$translation.$t,
+			editLink: _.findWhere(item.link, {rel: 'edit'}).href
 		});
 	});
 	return result;
+};
+
+GoogleSpreadsheetsHelper.prototype.updateCell = function(item, callback) {
+	var token = auth.getToken();
+	var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
+					'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
+					'<id>' + item.id + '</id>' +
+					'<gsx:context>' + item.context + '</gsx:context>' +
+					'<gsx:key>' + item.key + '</gsx:key>' +
+					'<gsx:originalValue>' + item.originalValue + '</gsx:originalValue>' +
+					'<gsx:project>' + item.project + '</gsx:project>' +
+					'<gsx:translation>' + item.translation + '</gsx:translation>' +
+				'</entry>';
+	var url = item.editLink;
+	request.put({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
+		if(err) {
+			console.log(err);
+		} else{
+			console.log('posted!');
+		}
+		callback();
+	}).auth(null, null, true, token);
 };
 
 GoogleSpreadsheetsHelper.prototype.addNewCell = function(key, cell, callback) {
@@ -112,7 +137,11 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsData = function(key, callback) {
 		if(!body) {
 			callback("Empty response", []);
 		}
-		var parsed = JSON.parse(body);
+		try {
+			parsed = JSON.parse(body);
+		} catch (e) {
+			callback(e, []);
+		}
 		if(parsed) {
 			var worksheets = parsed.feed.entry.slice(1);
 			var langRegexp = /\((.*)\)/;

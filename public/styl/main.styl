@@ -91,7 +91,7 @@ input
 	float left
 	height 90%
 
-.translation-item
+.translation-item, .history-translation-item
 	position relative
 	padding 10px
 	margin 4px
@@ -186,6 +186,29 @@ input
 		visibility hidden
 		transition all 0.4s ease-in-out 0s
 		transform scale(0)
+
+#history
+	& > div
+		background white
+		width 80%
+		margin auto
+	#history-items
+		height 80%
+		border-radius 4px 4px 0px 0px
+		padding-top 4px
+	#close-button-container
+		height 20%
+		position relative
+		border-radius 0px 0px 4px 4px
+		#close-button
+			position absolute
+			right 0
+			bottom 0
+			height 50px
+			width 15%
+			margin: 2% 2%
+			float right
+			cursor pointer
 
 #spinner
 	& > div
