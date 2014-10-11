@@ -58,15 +58,22 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetJson = function(key, callback) 
 			request.get(url, function(err, response, body) {
 				++requestsFinished;
 				if(!body) {
-					callback([]);
+					callback("Empty response", []);
 				}
-				var parsed = JSON.parse(body);
+				var parsed;
+				try {
+					parsed = JSON.parse(body);
+				} catch (e) {
+					callback(e, []);
+				}
 				if(parsed) {
 					var entries = parsed.feed.entry;
 					result[lang] = parseLocalisationList(entries, lang);
+				} else {
+					console.log('Error during parsing ' + lang);
 				}
 				if(count === requestsFinished) {
-					callback(result);
+					callback(null, result);
 				}
 			}).auth(null, null, true, token);
 		});
@@ -77,17 +84,22 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetJson = function(url, callback) {
 	var token = auth.getToken();
 	request.get(url + '?alt=json', function(err, response, body) {
 		if(!body) {
-			callback([]);
+			callback("Empty response", []);
 		}
-		var parsed = JSON.parse(body);
+		var parsed;
+		try {
+			parsed = JSON.parse(body);
+		} catch (e) {
+			callback(e, []);
+		}
 		if(parsed) {
 			var langRegexp = /\((.*)\)/;
 			var lang = parsed.feed.title.$t.match(langRegexp);
 			var entries = parsed.feed.entry;
 			var result = parseLocalisationList(entries, lang[1]);
-			callback(result);
+			callback(null, result);
 		} else {
-			callback([]);
+			callback("Can't parse worksheet", []);
 		}
 	}).auth(null, null, true, token);	
 };
@@ -98,7 +110,7 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsData = function(key, callback) {
 	var url = this.root + '/worksheets/' + key + '/private/full?alt=json';
 	request.get(url, function(err, response, body) {
 		if(!body) {
-			callback([]);
+			callback("Empty response", []);
 		}
 		var parsed = JSON.parse(body);
 		if(parsed) {
@@ -113,7 +125,7 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsData = function(key, callback) {
 					link: link ? link.href : null
 				};
 			});
-			callback(result);
+			callback(null, result);
 		}
 	}).auth(null, null, true, token);
 };

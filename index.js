@@ -68,21 +68,21 @@ app.get('/code', function(req, res) {
 
 app.get('/worksheets', function(req, res) {
 	var key = req.query.key;
-	spreadsheetsHelper.getWorksheetsData(key, function(worksheets) {
+	spreadsheetsHelper.getWorksheetsData(key, function(err, worksheets) {
 		res.json(worksheets);
 	});
 });
 
 app.get('/worksheet', function(req, res) {
 	var url = req.query.url;
-	spreadsheetsHelper.getWorksheetJson(url, function(result) {
+	spreadsheetsHelper.getWorksheetJson(url, function(err, result) {
 		res.json(result);
 	});
 });
 
 app.get('/generate', checkToken, function(req, res) {
 	var key = req.query.key;
-	spreadsheetsHelper.getSpreadsheetJson(key, function(localisation) {
+	spreadsheetsHelper.getSpreadsheetJson(key, function(err, localisation) {
 		dbHelper.insertLocalisation(localisation);
 		fileSystemHelper.generateJsonFiles(localisation, function() {
 			res.json(localisation);

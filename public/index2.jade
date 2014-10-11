@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+	head
+		title Localisation Helper
+		link(rel="stylesheet", href="css/main.css")
+		link(rel="stylesheet", href="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.min.css")
+		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
+	body
+		#container
+			#data-controls-panel
+				#language-controls
+					input#language-search(type='text')
+				#localisation-controls
+					label(for='localisation-changed-only') Show changed only
+					input#localisation-changed-only(type='checkbox')
+					input#localisation-search(type='text')
+			#worksheets
+			#data
+		#popup.visible
+			ul.source-list
+				li
+					textarea.html-code(readonly='')
+					textarea.css-code(readonly='')
+				li#login-form
+					div
+						#sp-key
+							input#sp-key-value(type='text', placeholder='Enter spreadsheet key', value='1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s')
+							button#sp-key-ok Ok
+				li#spinner
+					div
+						.loader
+		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
+		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
+		script(type="text/javascript", src="lib/underscore.js")
+		script(type="text/javascript", src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js")
+		script(type="text/javascript", src="js/main.js")
+		include templates/translation-item-template
+		include templates/worksheet-template
