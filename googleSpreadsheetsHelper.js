@@ -40,18 +40,17 @@ GoogleSpreadsheetsHelper.prototype.updateCell = function(item, callback) {
 	var url = item.editLink;
 	request.put({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
 		if(err) {
-			console.log(err);
-		} else{
-			console.log('posted!');
+			callback(err, {result: 'error'});
+		} else if(body.indexOf(item.translation) > -1) {
+			callback(null, {result: 'ok'});
+		} else {
+			callback('Smth wrong during google API reques.', {result: 'error'});
 		}
-		callback();
 	}).auth(null, null, true, token);
 };
 
 GoogleSpreadsheetsHelper.prototype.addNewCell = function(key, cell, callback) {
 	var token = auth.getToken();
-	var data = ''
-	// var url = this.root + '/list/' + key + '/private/full';
 	var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
 					'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
 					'<gsx:context>Nothing here</gsx:context>' +

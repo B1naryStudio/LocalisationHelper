@@ -82,8 +82,8 @@ app.get('/worksheet', function(req, res) {
 
 app.post('/update', function(req, res) {
 	var item = req.body.item;
-	spreadsheetsHelper.updateCell(item, function() {
-		res.json('ok');
+	spreadsheetsHelper.updateCell(item, function(result) {
+		res.json(result);
 	});
 });
 
