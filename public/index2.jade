@@ -9,11 +9,12 @@ html(lang="en")
 		#container
 			#data-controls-panel
 				#language-controls
-					input#language-search(type='text')
+					input#language-search(type='text', placeholder="Search by language")
+					button#create-new-localisation New Key
 				#localisation-controls
 					label(for='localisation-changed-only') Show changed only
 					input#localisation-changed-only(type='checkbox')
-					input#localisation-search(type='text')
+					input#localisation-search(type='text', placeholder="Search by translations, keys...")
 			#worksheets
 			#data
 		#popup.visible
@@ -31,6 +32,18 @@ html(lang="en")
 					div#close-button-container
 						button#close-button
 							i.fa.fa-arrow-left Back
+				li#localisation-new
+					div
+						div
+							select
+								option(value="CSB") CSB 
+								option(value="VIS") VIS
+						input#localisation-key(placeholder="Key")
+						input#localisation-context(placeholder="Context")
+						input#localisation-translation(placeholder="Translation")
+						div#buttons-section
+							button#localisation-new-ok Create
+							button#localisation-new-cancel Close
 
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")

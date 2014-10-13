@@ -6,14 +6,15 @@ var app = app || {};
 
 	function PageController() {
 		this.$el = {
-			container    : $('#container'),
-			data         : $('#data'),
-			worksheets   : $('#worksheets'),
-			loginForm    : $('#login-form'),
-			spinner      : $('#spinner'),
-			popup        : $('#popup'),
-			history      : $('#history'),
-			historyItems : $('#history-items')
+			data            : $('#data'),
+			popup           : $('#popup'),
+			history         : $('#history'),
+			spinner         : $('#spinner'),
+			loginForm       : $('#login-form'),
+			container       : $('#container'),
+			worksheets      : $('#worksheets'),
+			historyItems    : $('#history-items'),
+			newLocalisation : $('#localisation-new')
 		};
 		this.$templates = {
 			worksheetsTemplate      : $('#worksheet-template'),
@@ -115,8 +116,8 @@ var app = app || {};
 	PageController.prototype.closeHistoryPopup = function() {
 		self.$el.popup.toggleClass('visible', false);
 		self.$el.history.toggleClass('visible', false);
+		self.$el.historyItems.mCustomScrollbar("destroy");
 		self.$el.historyItems.html('');
-		self.$el.historyItems.removeAttr('class');
 	};
 
 	PageController.prototype.setHistoryItem = function() {
@@ -178,6 +179,20 @@ var app = app || {};
 		$translationItemContainer.toggleClass('changed', isChanged);
 	};
 
+	PageController.prototype.openCreateNewKeyDialog = function() {
+		self.$el.popup.toggleClass('visible', true);
+		self.$el.newLocalisation.toggleClass('visible', true);
+	};
+
+	PageController.prototype.closeNewKeyPopup = function() {
+		self.$el.popup.toggleClass('visible', false);
+		self.$el.newLocalisation.toggleClass('visible', false);
+	};
+
+	PageController.prototype.addNewKey = function() {
+		// TODO add new key
+	};
+
 	PageController.prototype.applyScrollbar = function(container) {
 		container.mCustomScrollbar({
 			theme: 'dark-3',
@@ -191,6 +206,9 @@ var app = app || {};
 	PageController.prototype.bindListeners = function() {
 		$('#sp-key-ok').click(this.loadSpreadsheet);
 		$('#close-button').click(this.closeHistoryPopup);
+		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
+		$('#localisation-new-cancel').click(this.closeNewKeyPopup);
+		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);
 		$('#worksheets').on('click', '.worksheet', this.getWorksheetsData);
 		$('#history-items').on('click', '.history-translation-item', this.setHistoryItem);
