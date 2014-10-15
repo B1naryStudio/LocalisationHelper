@@ -35,15 +35,16 @@ html(lang="en")
 				li#localisation-new
 					div
 						div
-							select
+							select#localisation-project
 								option(value="CSB") CSB 
 								option(value="VIS") VIS
-						input#localisation-key(placeholder="Key")
-						input#localisation-context(placeholder="Context")
-						input#localisation-translation(placeholder="Translation")
+						input#localisation-key(placeholder="Key", value="Key") 
+						input#localisation-context(placeholder="Context", value="Context") 
+						input#localisation-original(placeholder="Original value (English)", value="Original value (English)") 
+						input#localisation-translation(placeholder="Translation", value="Translation") 
 						div#buttons-section
-							button#localisation-new-ok Create
 							button#localisation-new-cancel Close
+							button#localisation-new-ok Create
 
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")

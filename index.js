@@ -87,6 +87,14 @@ app.post('/update', function(req, res) {
 	});
 });
 
+app.post('/new', function(req, res) {
+	var item = req.body.item;
+	var key = req.body.key;
+	spreadsheetsHelper.addNewCell(key, item, function(result) {
+		res.json(result);
+	});
+});
+
 app.get('/generate', checkToken, function(req, res) {
 	var key = req.query.key;
 	spreadsheetsHelper.getSpreadsheetJson(key, function(err, localisation) {

@@ -14,7 +14,13 @@ var app = app || {};
 			container       : $('#container'),
 			worksheets      : $('#worksheets'),
 			historyItems    : $('#history-items'),
-			newLocalisation : $('#localisation-new')
+			spreadsheetKey  : $('#sp-key-value'),
+			newLocalisation : $('#localisation-new'),
+			locKey          : $('#localisation-key'),
+			locProject      : $('#localisation-project'),
+			locContext      : $('#localisation-context'),
+			locOriginal     : $('#localisation-original'),
+			locTranslation  : $('#localisation-translation'),
 		};
 		this.$templates = {
 			worksheetsTemplate      : $('#worksheet-template'),
@@ -97,7 +103,7 @@ var app = app || {};
 	};
 
 	PageController.prototype.loadSpreadsheet = function() {
-		var key = $('#sp-key-value').val();
+		var key = self.$el.spreadsheetKey.val();
 		self.$el.spinner.toggleClass('visible', true);
 		self.$el.loginForm.toggleClass('visible', false);
 		$.get('/worksheets', {key: key}, function(list) {
@@ -190,7 +196,19 @@ var app = app || {};
 	};
 
 	PageController.prototype.addNewKey = function() {
-		// TODO add new key
+		var item = {		
+			key : self.$el.locKey.val(),
+			project : self.$el.locProject.val(),
+			context : self.$el.locContext.val(),
+			translation : self.$el.locTranslation.val(),
+			originalValue: self.$el.locOriginal.val()
+		};
+		var key = self.$el.spreadsheetKey.val();
+		self.$el.popup.toggleClass('visible', true);
+		$.post('/new', {item: item, key: key}, function(result) {
+			self.$el.popup.toggleClass('visible', false);
+			alert(JSON.stringify(result));
+		});
 	};
 
 	PageController.prototype.applyScrollbar = function(container) {
