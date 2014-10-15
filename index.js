@@ -32,30 +32,6 @@ app.get('/', checkToken, function(req, res) {
 	res.sendFile(staticDir + '/index2.html');
 });
 
-app.get('/login', function(req, res) {
-	var url = auth.generateAuthLink(req);
-	res.redirect(url);
-});
-
-app.get('/post', function(req, res) {
-	spreadsheetsHelper.addNewCell(null, null, function() {
-		res.json('ok');
-	});
-});
-
-app.get('/history', function(req, res) {
-	var item = req.query.item;
-	dbHelper.getLocalisationHistory(item, function(result) {
-		res.json(result);
-	});
-});
-
-app.get('/latest', function(req, res) {
-	dbHelper.getLatestLocalisation(function(result) {
-		res.json(result);
-	});
-});
-
 app.get('/code', function(req, res) {
 	auth.requestToken(req, function(token) {
 		if(token) {
@@ -66,42 +42,80 @@ app.get('/code', function(req, res) {
 	});
 });
 
-app.get('/worksheets', function(req, res) {
-	var key = req.query.key;
-	spreadsheetsHelper.getWorksheetsData(key, function(err, worksheets) {
-		res.json(worksheets);
-	});
+app.get('/login', function(req, res) {
+	var url = auth.generateAuthLink(req);
+	res.redirect(url);
 });
 
-app.get('/worksheet', function(req, res) {
+app.get('/localisation', function(req, res) {
 	var url = req.query.url;
-	spreadsheetsHelper.getWorksheetJson(url, function(err, result) {
-		res.json(result);
+	spreadsheetsHelper.getWorksheetData(url, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err})
+		} else {
+			res.json(result);
+		}
 	});
 });
 
-app.post('/update', function(req, res) {
+app.put('/localisation', function(req, res) {
 	var item = req.body.item;
-	spreadsheetsHelper.updateCell(item, function(result) {
-		res.json(result);
+	spreadsheetsHelper.updateLocalisation(item, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err})
+		} else {
+			res.json(result);
+		}
 	});
 });
 
-app.post('/new', function(req, res) {
+app.post('/localisation', function(req, res) {
 	var item = req.body.item;
 	var key = req.body.key;
-	spreadsheetsHelper.addNewCell(key, item, function(result) {
-		res.json(result);
+	spreadsheetsHelper.addNewLocalisation(key, item, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err})
+		} else {
+			res.json(result);
+		}
 	});
 });
 
 app.get('/generate', checkToken, function(req, res) {
 	var key = req.query.key;
-	spreadsheetsHelper.getSpreadsheetJson(key, function(err, localisation) {
-		dbHelper.insertLocalisation(localisation);
+	spreadsheetsHelper.getSpreadsheetData(key, function(err, localisation) {
+		dbHelper.insertLocalisations(localisation);
 		fileSystemHelper.generateJsonFiles(localisation, function() {
 			res.json(localisation);
 		});		
+	});
+});
+
+app.get('/history', function(req, res) {
+	var item = req.query.item;
+	dbHelper.getLocalisationHistory(item, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err})
+		} else {
+			res.json(result);
+		}
+	});
+});
+
+app.get('/latest', function(req, res) {
+	dbHelper.getLatestLocalisation(function(result) {
+		res.json(result);
+	});
+});
+
+app.get('/worksheets', function(req, res) {
+	var key = req.query.key;
+	spreadsheetsHelper.getWorksheetsInfo(key, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err})
+		} else {
+			res.json(result);
+		}
 	});
 });
 

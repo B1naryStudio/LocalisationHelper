@@ -91,14 +91,19 @@ var app = app || {};
 		var url = item.find('.worksheet-url').html();
 		var container = $('<div>').attr('id', 'translation-content');
 		self.$el.popup.toggleClass('visible', true);
-		$.get('/worksheet', {url: url}, function(result) {
-			self.$el.popup.toggleClass('visible', false);
-			result.forEach(function(item) {
-				var translationItem = self.$templates.translationItemTemplate.tmpl(item);
-				container.append(translationItem);
-			});
-			self.$el.data.html(container);
-			self.applyScrollbar(container);
+		$.get('/localisation', {url: url}, function(response) {
+			if(response.status === 'ok') {
+				var list = response.data;
+				self.$el.popup.toggleClass('visible', false);
+				list.forEach(function(item) {
+					var translationItem = self.$templates.translationItemTemplate.tmpl(item);
+					container.append(translationItem);
+				});
+				self.$el.data.html(container);
+				self.applyScrollbar(container);
+			} else {
+				console.log(response.error);
+			}
 		});
 	};
 
@@ -106,16 +111,21 @@ var app = app || {};
 		var key = self.$el.spreadsheetKey.val();
 		self.$el.spinner.toggleClass('visible', true);
 		self.$el.loginForm.toggleClass('visible', false);
-		$.get('/worksheets', {key: key}, function(list) {
-			self.$el.popup.toggleClass('visible', false);
-			self.$el.container.show();
-			self.$el.worksheets.html('');
-			list.forEach(function(item) {
-				var $worksheet = self.$templates.worksheetsTemplate.tmpl(item);
-				self.$el.worksheets.append($worksheet);
-				$worksheet.fadeIn();
-			});
-			self.applyScrollbar(self.$el.worksheets);
+		$.get('/worksheets', {key: key}, function(response) {
+			if(response.status === 'ok') {
+				var list = response.data;
+				self.$el.popup.toggleClass('visible', false);
+				self.$el.container.show();
+				self.$el.worksheets.html('');
+				list.forEach(function(item) {
+					var $worksheet = self.$templates.worksheetsTemplate.tmpl(item);
+					self.$el.worksheets.append($worksheet);
+					$worksheet.fadeIn();
+				});
+				self.applyScrollbar(self.$el.worksheets);
+			} else {
+				console.log(response.error);
+			}
 		});
 	};
 
@@ -142,15 +152,20 @@ var app = app || {};
 		self.$el.popup.toggleClass('visible', true);
 		container.toggleClass('selected', true);
 		if(item) {
-			$.get('/history', {item: item}, function(list) {
-				var header = $('<div>').text('History for lang: ' + item.lang + ' key: ' + item.key);
-				self.$el.historyItems.append(header);
-				list.forEach(function(item) {
-					var $historyItem = self.$templates.historyItemTemplate.tmpl(item);
-					self.$el.historyItems.append($historyItem);
-				});
-				self.applyScrollbar(self.$el.historyItems);
-				self.$el.history.toggleClass('visible', true);
+			$.get('/history', {item: item}, function(response) {
+				if(response.status === 'ok') {
+					var list = response.data; 
+					var header = $('<div>').text('History for lang: ' + item.lang + ' key: ' + item.key);
+					self.$el.historyItems.append(header);
+					list.forEach(function(item) {
+						var $historyItem = self.$templates.historyItemTemplate.tmpl(item);
+						self.$el.historyItems.append($historyItem);
+					});
+					self.applyScrollbar(self.$el.historyItems);
+					self.$el.history.toggleClass('visible', true);
+				} else {
+					console.log(response.error);
+				}
 			});
 		}
 	};
@@ -160,11 +175,20 @@ var app = app || {};
 		var $textContainer = $translationItemContainer.find('.translation-value-text');
 		var initialData = $translationItemContainer.data('item');
 		initialData.translation = $textContainer.text();
-		$.post('/update', {item: initialData}, function(response) {
-			if(response.result === 'ok') {
-				$translationItemContainer.toggleClass('changed', false);
-			} else {
-				alert(response);
+		$.ajax({
+			url: '/localisation',
+			type: 'PUT',
+			data: {item: initialData},
+			success: function(response) {
+				if(response.status === 'ok') {
+					$translationItemContainer.toggleClass('changed', false);
+					$textContainer.data('default', $textContainer.text());
+				} else {
+					alert(response.error);
+				}
+			},
+			error: function(err) {
+				alert(err);
 			}
 		});
 	};
@@ -205,9 +229,13 @@ var app = app || {};
 		};
 		var key = self.$el.spreadsheetKey.val();
 		self.$el.popup.toggleClass('visible', true);
-		$.post('/new', {item: item, key: key}, function(result) {
-			self.$el.popup.toggleClass('visible', false);
-			alert(JSON.stringify(result));
+		$.post('/localisation', {item: item, key: key}, function(response) {
+			if(response.status === 'ok') {
+				self.$el.popup.toggleClass('visible', false);
+				console.log(JSON.stringify(response));
+			} else {
+				console.log(response.error);
+			}			
 		});
 	};
 

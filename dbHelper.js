@@ -2,9 +2,7 @@ var mongo = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
 
-function DbHelper() {
-
-};
+function DbHelper() {};
 
 DbHelper.prototype.initialize = function(uri) {
 	var self = this;
@@ -17,7 +15,7 @@ DbHelper.prototype.initialize = function(uri) {
 	});
 };
 
-DbHelper.prototype.insertLocalisation = function(records) {
+DbHelper.prototype.insertLocalisations = function(records) {
 	var localisation = this.db.collection('localisation');
 	for(var lang in records) {
 		_.each(records[lang], function(item) {
@@ -29,45 +27,58 @@ DbHelper.prototype.insertLocalisation = function(records) {
 	}
 };
 
+DbHelper.prototype.insertLocalisation = function(item) {
+	item.createdAt = new Date();
+	this.db.collection('localisation').insert(item, function(err, docs) {
+		console.log('wrote ' + JSON.stringify(item));
+	});
+};
+
+DbHelper.prototype.logTranslationUpdate = function(localisation) {
+	this.insertLocalisation(localisation);
+	localisation.dateTime = new Date();
+	localisation.type = "update";
+	this.db.collection('diff').
+		insert(localisation, function(err, docs) {
+			if(!err) {
+				console.log('Logged localisation "Update". Key: ' + 
+					localisation.key + ', lang: ' + localisation.lang);
+			} else {
+				console.log('Can\'t log localisation "Update". Reason: ' + err);
+			}
+		});
+};
+DbHelper.prototype.logTranslationAdd = function(localisation) {
+	this.insertLocalisation(localisation);
+	localisation.dateTime = new Date();
+	localisation.type = "add";
+	this.db.collection('diff').
+		insert(localisation, function(err, docs) {
+			if(!err) {
+				console.log('Logged localisation "Add". Key: ' + 
+					localisation.key + ', lang: ' + localisation.lang);
+			} else {
+				console.log('Can\'t log localisation "Add". Reason: ' + err);
+			}
+		});
+};
+
 DbHelper.prototype.getLocalisationHistory = function(localisation, callback) {
 	this.db.collection('localisation')
 		.find({lang: localisation.lang, key: localisation.key})
 		.toArray(function(err, docs) {
-			callback(docs);
+			var result = {};
+			if(err) {
+				callback(err, {status: 'error'});
+			} else {
+				callback(null, {status: 'ok', data: docs});
+			}
 		});
 };
 
 DbHelper.prototype.getLatestLocalisation = function(callback) {
 	var localisation = this.db.collection('localisation');
-	var result = localisation.group(
-		{ lang: 1, key: 1 }, // keys
-		{}, // condition
-		{ items : [], item: {}}, //initial
-		function (curr, result) { // reduce
-			result.items.push(curr);
-		},
-		function(result) { // finalize
-			result.item = result.items.sort(function(a, b) {
-				return a.createdAt < b.createdAt;
-			})[0]; // TODO refactor
-			delete result.items;
-		},
-		true, // command
-		{}, // options
-		function(err, result) { // callback
-			
-			var localisations = {};
-			_.each(result, function(item) {
-				if(localisations[item.lang]) {
-					localisations[item.lang].push(item.item);
-				} else {
-					localisations[item.lang] = [item.item];
-				}
-			});
-			callback(localisations);
-		}
-	);
-
+	callback();
 };
 
 module.exports = new DbHelper();
