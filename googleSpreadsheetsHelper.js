@@ -1,7 +1,6 @@
 var request = require('request');
 var _ = require('underscore');
 var auth = require('./googleAuth');
-var async = require('async');
 var dbHelper = require('./dbHelper');
 
 function GoogleSpreadsheetsHelper() {
@@ -100,7 +99,7 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) 
 		if(response.status === 'ok') {
 			var count = response.data.length;
 			var requestsFinished = 0;
-			_.each(worksheets, function(item) {
+			_.each(response.data, function(item) {
 				var url = item.link + '?alt=json';
 				var lang = item.lang;		
 				request.get(url, function(err, response, body) {

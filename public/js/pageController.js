@@ -219,6 +219,13 @@ var app = app || {};
 		self.$el.newLocalisation.toggleClass('visible', false);
 	};
 
+	PageController.prototype.getLocalisationZip = function() {
+		var key = self.$el.spreadsheetKey.val();
+		$.get('/zip', {key: key}, function(response) {
+
+		});
+	};
+
 	PageController.prototype.addNewKey = function() {
 		var item = {		
 			key : self.$el.locKey.val(),
@@ -253,6 +260,7 @@ var app = app || {};
 		$('#sp-key-ok').click(this.loadSpreadsheet);
 		$('#close-button').click(this.closeHistoryPopup);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
+		$('#create-generate-json').click(this.getLocalisationZip);
 		$('#localisation-new-cancel').click(this.closeNewKeyPopup);
 		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);

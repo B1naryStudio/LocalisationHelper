@@ -1,5 +1,9 @@
-#localisations
-/localisation
+# Localisations
+/localisation/**/*.json
+
+# Zip
+*.zip
+
 # Logs
 logs
 *.log

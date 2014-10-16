@@ -81,13 +81,19 @@ app.post('/localisation', function(req, res) {
 	});
 });
 
-app.get('/generate', checkToken, function(req, res) {
+app.get('/zip', checkToken, function(req, res) {
 	var key = req.query.key;
-	spreadsheetsHelper.getSpreadsheetData(key, function(err, localisation) {
-		dbHelper.insertLocalisations(localisation);
-		fileSystemHelper.generateJsonFiles(localisation, function() {
-			res.json(localisation);
-		});		
+	spreadsheetsHelper.getSpreadsheetData(key, function(err, result) {
+		if(result.status === 'error') {
+			res.json('error');
+		} else {		
+			dbHelper.insertLocalisations(result.data);
+			fileSystemHelper.generateJsonFiles(result.data, function(stream) {
+				res.set('Content-Type', 'application/zip')
+				res.set('Content-Disposition', 'attachment; localisation.zip');
+				res.end();
+			});		
+		}
 	});
 });
 
