@@ -118,7 +118,7 @@ var app = app || {};
 					container.append($translationItem);
 				});
 				self.$el.data.html(container);
-				self.applyScrollbar(container);
+				// self.applyScrollbar(container);
 			} else {
 				console.log(response.error);
 			}
@@ -254,6 +254,7 @@ var app = app || {};
 		$.post('/localisation', {item: item, key: key}, function(response) {
 			if(response.status === 'ok') {
 				self.$el.popup.toggleClass('visible', false);
+				self.$el.newLocalisation.toggleClass('visible', false);
 				console.log(JSON.stringify(response));
 			} else {
 				console.log(response.error);
