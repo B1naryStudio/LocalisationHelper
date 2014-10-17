@@ -33,21 +33,40 @@ var app = app || {};
 		}, 400);
 
 		this.showModifiedOnly = false;
+		this.showMissedOnly = false;
 		this.bindListeners();
 		self = this;
 	};
 
-	PageController.prototype.showOnlyModified = function() {
-		var value = $(this).is(':checked');
-		var items = self.$el.data.find('.translation-item');
-		if(!value) {
-			items.fadeIn();
-			self.showModifiedOnly = false;
-		} else {
-			items.hide();
-			self.$el.data.find('.translation-item.changed').fadeIn();
-			self.showModifiedOnly = true;
+	function getAllTranslationItemsByCurrentFilter() {
+		var selector = '.translation-item';
+		if(self.showModifiedOnly) {
+			selector += '.changed';
+		}		
+		if(self.showMissedOnly) {
+			selector += '.missed';
 		}
+		return self.$el.data.find(selector);
+	}
+
+	function hideAllTranslations() {
+		self.$el.data.find('.translation-item').hide();
+	}
+
+	function showAllTranslations() {
+		self.$el.data.find('.translation-item').show();
+	}
+
+	PageController.prototype.showOnlyModified = function() {
+		self.showModifiedOnly = $(this).is(':checked');
+		hideAllTranslations();
+		getAllTranslationItemsByCurrentFilter().show();
+	};
+
+	PageController.prototype.showOnlyMissed = function() {
+		self.showMissedOnly  = $(this).is(':checked');
+		hideAllTranslations();
+		getAllTranslationItemsByCurrentFilter().show();		
 	};
 
 	PageController.prototype.searchByLanguages = function() {
@@ -62,28 +81,24 @@ var app = app || {};
 			return $(item).find('.worksheet-name').text().toLowerCase().indexOf(value) > -1 ||
 					$(item).find('.worksheet-lang').text().toLowerCase().indexOf(value) > -1;
 
-		}).fadeIn();
+		}).show();
 	};
 
 	PageController.prototype.searchByTranslations = function() {
 		var value = $(this).val().toLowerCase();
-		var items;
-		if(self.showModifiedOnly) {
-			items = self.$el.data.find('.translation-item.changed');
-		} else {
-			items = self.$el.data.find('.translation-item');
-		}
+		hideAllTranslations();
 		if(!value) {
-			items.show();
+			getAllTranslationItemsByCurrentFilter().show();
 			return;
-		}
-		items.hide();
-		items.filter(function(index, item) {
-			return $(item).find('.translation-key').text().toLowerCase().indexOf(value) > -1 ||
-					$(item).find('.translation-value').text().toLowerCase().indexOf(value) > -1 ||
-					$(item).find('.translation-original').text().toLowerCase().indexOf(value) > -1;
+		} else {
+			var items = getAllTranslationItemsByCurrentFilter();
+			items.filter(function(index, item) {
+				return $(item).find('.translation-key').text().toLowerCase().indexOf(value) > -1 ||
+						$(item).find('.translation-value').text().toLowerCase().indexOf(value) > -1 ||
+						$(item).find('.translation-original').text().toLowerCase().indexOf(value) > -1;
 
-		}).fadeIn();			
+			}).show();			
+		}
 	};
 
 	PageController.prototype.getWorksheetsData = function() {
@@ -96,8 +111,11 @@ var app = app || {};
 				var list = response.data;
 				self.$el.popup.toggleClass('visible', false);
 				list.forEach(function(item) {
-					var translationItem = self.$templates.translationItemTemplate.tmpl(item);
-					container.append(translationItem);
+					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
+					if(!item.translation) {
+						$translationItem.toggleClass('missed', true);
+					}
+					container.append($translationItem);
 				});
 				self.$el.data.html(container);
 				self.applyScrollbar(container);
@@ -264,6 +282,7 @@ var app = app || {};
 		$('#localisation-new-cancel').click(this.closeNewKeyPopup);
 		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);
+		$('#localisation-missed-only').click(this.showOnlyMissed);
 		$('#worksheets').on('click', '.worksheet', this.getWorksheetsData);
 		$('#history-items').on('click', '.history-translation-item', this.setHistoryItem);
 		$('#language-search').on('keyup', _.debounce(this.searchByLanguages, 200));

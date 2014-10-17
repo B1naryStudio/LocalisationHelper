@@ -127,7 +127,7 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 
 				output.on('close', function() {
 					console.log('done with the zip', outputPath);
-					callback(fs.createReadStream('localisation.zip'));
+					callback();
 				});
 
 				zipArchive.pipe(output);

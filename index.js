@@ -88,10 +88,8 @@ app.get('/zip', checkToken, function(req, res) {
 			res.json('error');
 		} else {		
 			dbHelper.insertLocalisations(result.data);
-			fileSystemHelper.generateJsonFiles(result.data, function(stream) {
-				res.set('Content-Type', 'application/zip')
-				res.set('Content-Disposition', 'attachment; localisation.zip');
-				res.end();
+			fileSystemHelper.generateJsonFiles(result.data, function() {
+				res.download(__dirname + '/localisation.zip');
 			});		
 		}
 	});
