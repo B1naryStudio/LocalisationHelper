@@ -1,19 +1,26 @@
 script#translation-item-template(type="text/x-jQuery-tmpl")
 	.translation-item(data-item='${JSON.stringify($data)}')
 		.translation-buttons-section
-			.translation-history
-				i.fa.fa-database
+			
 			.translation-actions
 				.translation-apply
 					i.fa.fa-check
 				.translation-cancel
 					i.fa.fa-times
-		.translation-key(title='Localisation Key')
-			i.fa.fa-key ${key}
+
 		.translation-value(title='Translation')
 			i.fa.fa-refresh
 			span.translation-value-text(contenteditable='true', data-default='${translation}') ${translation}
 		.translation-original(title='Original (English) value')
-			i.fa.fa-home ${originalValue}
+			i.fa.fa-home 
+			${originalValue}
+		
+		.translation-history
+			//- i.fa.fa-database
+			|history
+		.translation-key(title='Localisation Key')
+			i.fa.fa-key 
+			${key}
 		.translation-context(title='Context')
-			i.fa.fa-comments ${context}
+			i.fa.fa-comments 
+			${context}
