@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var request = require('request');
+var session = require('express-session');
 var bodyParser = require('body-parser');
 var spreadsheetsHelper = require('./googleSpreadsheetsHelper');
 var fileSystemHelper = require('./fileSystemHelper');
@@ -13,15 +14,13 @@ app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(session({secret: 'localisation secret'}))
 
-// app.set('view options', {
-// 	pretty: true
-// });
 dbHelper.initialize(app.get('db-uri'));
 
 
 function checkToken(req, res, next) {
-	if(auth.getToken()) {
+	if(req.session.token) {
 		next();
 	} else {
 		res.redirect('/login');
@@ -35,6 +34,7 @@ app.get('/', checkToken, function(req, res) {
 app.get('/code', function(req, res) {
 	auth.requestToken(req, function(token) {
 		if(token) {
+			req.session.token = token;
 			res.redirect('/');
 		} else {
 			res.redirect('/login');
@@ -49,7 +49,8 @@ app.get('/login', function(req, res) {
 
 app.get('/localisation', function(req, res) {
 	var url = req.query.url;
-	spreadsheetsHelper.getWorksheetData(url, function(err, result) {
+	var token = req.session.token;
+	spreadsheetsHelper.getWorksheetData(token, url, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err})
 		} else {
@@ -60,7 +61,8 @@ app.get('/localisation', function(req, res) {
 
 app.put('/localisation', function(req, res) {
 	var item = req.body.item;
-	spreadsheetsHelper.updateLocalisation(item, function(err, result) {
+	var token = req.session.token;
+	spreadsheetsHelper.updateLocalisation(token, item, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err})
 		} else {
@@ -72,7 +74,8 @@ app.put('/localisation', function(req, res) {
 app.post('/localisation', function(req, res) {
 	var item = req.body.item;
 	var key = req.body.key;
-	spreadsheetsHelper.addNewLocalisation(key, item, function(err, result) {
+	var token = req.session.token;
+	spreadsheetsHelper.addNewLocalisation(token, key, item, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err})
 		} else {
@@ -83,7 +86,8 @@ app.post('/localisation', function(req, res) {
 
 app.get('/zip', checkToken, function(req, res) {
 	var key = req.query.key;
-	spreadsheetsHelper.getSpreadsheetData(key, function(err, result) {
+	var token = req.session.token;
+	spreadsheetsHelper.getSpreadsheetData(token, key, function(err, result) {
 		if(result.status === 'error') {
 			res.json('error');
 		} else {		
@@ -114,7 +118,8 @@ app.get('/latest', function(req, res) {
 
 app.get('/worksheets', function(req, res) {
 	var key = req.query.key;
-	spreadsheetsHelper.getWorksheetsInfo(key, function(err, result) {
+	var token = req.session.token;
+	spreadsheetsHelper.getWorksheetsInfo(token, key, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err})
 		} else {

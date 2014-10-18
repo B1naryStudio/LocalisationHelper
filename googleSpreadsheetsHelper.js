@@ -26,8 +26,7 @@ function parseLocalisationList(entries, lang) {
 };
 
 // updates existing localisation key
-GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback) {
-	var token = auth.getToken();
+GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, callback) {
 	var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
 					'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
 					'<id>' + item.id + '</id>' +
@@ -51,9 +50,8 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback)
 };
 
 // adds new localisation key to each lang (worksheet) in spreadsheet
-GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, callback) {
-	var token = auth.getToken();
-	this.getWorksheetsInfo(key, function(err, response) {
+GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(token, key, item, callback) {
+	this.getWorksheetsInfo(token, key, function(err, response) {
 		if(response.status === 'ok') {
 			var count = response.data.length;
 			var requestsFinished = 0;
@@ -92,10 +90,9 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, call
 };
 
 // returns cell-based spreadsheets data divided by language using spreadsheet key
-GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) {
+GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(token, key, callback) {
 	var result = {};
-	var token = auth.getToken();
-	this.getWorksheetsInfo(key, function(err, response) {
+	this.getWorksheetsInfo(token, key, function(err, response) {
 		if(response.status === 'ok') {
 			var count = response.data.length;
 			var requestsFinished = 0;
@@ -131,8 +128,7 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) 
 }
 
 // Returns cell-based data from worksheet using worksheet url
-GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(url, callback) {
-	var token = auth.getToken();
+GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(token, url, callback) {
 	request.get(url + '?alt=json', function(err, response, body) {
 		if(!body) {
 			callback("Empty response", {status: 'error', data: []});
@@ -156,8 +152,7 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(url, callback) {
 };
 
 // Returns worksheets information (name, lang, link) using spreadsheet key
-GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(key, callback) {
-	var token = auth.getToken();
+GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(token, key, callback) {
 	var self = this;
 	var url = this.root + '/worksheets/' + key + '/private/full?alt=json';
 	request.get(url, function(err, response, body) {
