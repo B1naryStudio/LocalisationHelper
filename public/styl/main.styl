@@ -6,6 +6,8 @@ body, html
 	padding 0
 	margin 0
 	overflow hidden
+	font-family 'Open Sans', sans-serif
+	box-sizes: border-box
 
 /*------------------------------------------------------------------
 Scrollbars
@@ -179,12 +181,17 @@ input
 		display block
 
 .worksheet
-	height 50px
-	width 100%
+	height: auto
+	width: 100%
+	padding: .2rem
 	display none
 	cursor pointer
 	&:hover
-		background rgba(0,0,0,0.1)
+		.worksheet-name
+			color: #444
+
+	.worksheet-name
+		color: #aaa
 
 #worksheets
 	width 30%
@@ -203,15 +210,21 @@ input
 	overflow hidden
 	position relative
 	padding 10px
-	margin 4px
+	margin 0px 3px
 	cursor pointer
-	box-shadow 0px 0px 5px 0px #000
+	transition: background-color .08s linear
+	border-bottom solid 1px #eee
 	.translation-buttons-section
 		overflow hidden
 	&.changed
-		background rgba(255,0,0,0.3)
+		box-shadow: 0 0 3px 1px #FF0A0A
+		border: 1px solid rgb(255, 108, 108)
+		/*background rgba(255,0,0,0.3)*/
 		.translation-actions
 			display block
+
+		&:hover
+			box-shadow: 0 0 3px 1px #FF0A0A
 	.translation-actions
 		display none
 		position absolute
@@ -219,10 +232,48 @@ input
 		right 0
 		padding 4px
 	&:hover
-		box-shadow 0px 0px 5px 1px #1961CC
+		//box-shadow 0px 0px 3px 1px #1961CC
+		background-color: #F4F4F4
+
+		.translation-history
+			opacity: 1
+.fa-key, .fa-refresh, .fa-home, .fa-comments
+	padding-right: .5rem
+	font-size: .9rem
+	color: #aaa
+
+.translation-history, .translation-key, .translation-context
+	position: relative
+	float: right
+	font-size: .6rem
+	color: #aaa
+	padding-right: .5rem
+	transition: all .2s linear
+	opacity: 0
+	font-weight: 600
+	&:hover
+		color: #555
+
+.translation-key, .translation-context
+	float: left
+	opacity: 1
+	cursor: initial
+	font-weight: 400
+	.fa-key
+		padding-right: .2rem
+
+	&:hover
+		color: #aaa
+.translation-value
+	color: #444
+	font-size: 1rem
+.translation-original
+	padding-bottom: .3rem
+	color: #888
+	font-size: .9rem
 
 .translation-buttons-section 
-	.translation-history, 
+	/*.translation-history,*/ 
 	.translation-apply, 
 	.translation-cancel
 		width 25px
@@ -241,10 +292,6 @@ input
 .translation-cancel
 	&:hover
 		color red
-
-.translation-history
-	&:hover
-		color blue
 
 #translation-content
 	height 100%
@@ -344,27 +391,27 @@ input
 @keyframes load4 {
 	0%,
 	100% {
-		box-shadow: 0em -3em 0em 0.2em #ffffff, 2em -2em 0 0em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 0em #ffffff;
+		box-shadow: 0em -3em 0em 0.2em #ffffff, 2em -2em 0 0em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 0em #ffffff
 	}
 	12.5% {
-		box-shadow: 0em -3em 0em 0em #ffffff, 2em -2em 0 0.2em #ffffff, 3em 0em 0 0em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff;
+		box-shadow: 0em -3em 0em 0em #ffffff, 2em -2em 0 0.2em #ffffff, 3em 0em 0 0em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff
 	}
 	25% {
-		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 0em #ffffff, 3em 0em 0 0.2em #ffffff, 2em 2em 0 0em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff;
+		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 0em #ffffff, 3em 0em 0 0.2em #ffffff, 2em 2em 0 0em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff
 	}
 	37.5% {
-		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 0em #ffffff, 2em 2em 0 0.2em #ffffff, 0em 3em 0 0em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff;
+		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 0em #ffffff, 2em 2em 0 0.2em #ffffff, 0em 3em 0 0em #ffffff, -2em 2em 0 -0.5em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff
 	}
 	50% {
-		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 0em #ffffff, 0em 3em 0 0.2em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff;
+		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 0em #ffffff, 0em 3em 0 0.2em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 -0.5em #ffffff, -2em -2em 0 -0.5em #ffffff
 	}
 	62.5% {
-		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 0em #ffffff, -2em 2em 0 0.2em #ffffff, -3em 0em 0 0em #ffffff, -2em -2em 0 -0.5em #ffffff;
+		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 0em #ffffff, -2em 2em 0 0.2em #ffffff, -3em 0em 0 0em #ffffff, -2em -2em 0 -0.5em #ffffff
 	}
 	75% {
-		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 0.2em #ffffff, -2em -2em 0 0em #ffffff;
+		box-shadow: 0em -3em 0em -0.5em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 0.2em #ffffff, -2em -2em 0 0em #ffffff
 	}
 	87.5% {
-		box-shadow: 0em -3em 0em 0em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 0em #ffffff, -2em -2em 0 0.2em #ffffff;
+		box-shadow: 0em -3em 0em 0em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 0em #ffffff, -2em -2em 0 0.2em #ffffff
 	}
 }
