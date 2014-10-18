@@ -36,7 +36,7 @@ GoogleAuth.prototype.requestToken = function(req, callback) {
 			var parsed = JSON.parse(body);
 			console.log(parsed);
 			if(parsed.access_token && parsed.expires_in !== undefined){
-				callback(token);
+				callback(parsed.access_token);
 			} else {
 				callback(null);
 			}
