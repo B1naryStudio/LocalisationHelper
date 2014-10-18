@@ -5,9 +5,9 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var spreadsheetsHelper = require('./googleSpreadsheetsHelper');
 var fileSystemHelper = require('./fileSystemHelper');
-var auth = require('./googleAuth');
+var googleAuth = require('./googleAuth');
 var dbHelper = require('./dbHelper');
-
+var auth = require('basic-auth');
 var staticDir = __dirname + '/public';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
@@ -32,11 +32,17 @@ app.get('/', checkToken, function(req, res) {
 });
 
 app.get('/admin', checkToken, function(req, res) {
-	res.sendFile(staticDir + '/admin.html')
+	// var credentials = auth(req);
+	// if(credentials.name === 'test' && credentials.pass === 'test') {
+	// 	res.sendFile(staticDir + '/admin.html');
+	// } else {
+	// 	res.status(401).end();
+	// }
+	res.sendFile(staticDir + '/admin.html');
 });
 
 app.get('/code', function(req, res) {
-	auth.requestToken(req, function(token) {
+	googleAuth.requestToken(req, function(token) {
 		if(token) {
 			req.session.token = token;
 			res.redirect('/');
@@ -47,7 +53,7 @@ app.get('/code', function(req, res) {
 });
 
 app.get('/login', function(req, res) {
-	var url = auth.generateAuthLink(req);
+	var url = googleAuth.generateAuthLink(req);
 	res.redirect(url);
 });
 
@@ -96,8 +102,8 @@ app.get('/zip', checkToken, function(req, res) {
 			res.json('error');
 		} else {		
 			dbHelper.insertLocalisations(result.data);
-			fileSystemHelper.generateJsonFiles(result.data, function() {
-				res.download(__dirname + '/localisation.zip');
+			fileSystemHelper.generateJsonFiles(result.data, function(path) {
+				res.download(path);
 			});		
 		}
 	});

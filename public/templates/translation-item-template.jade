@@ -12,15 +12,15 @@ script#translation-item-template(type="text/x-jQuery-tmpl")
 			i.fa.fa-refresh
 			span.translation-value-text(contenteditable='true', data-default='${translation}') ${translation}
 		.translation-original(title='Original (English) value')
-			i.fa.fa-home 
-			${originalValue}
+			i.fa.fa-home
+			|${originalValue}
 		
 		.translation-history
 			//- i.fa.fa-database
 			|history
 		.translation-key(title='Localisation Key')
-			i.fa.fa-key 
-			${key}
+			i.fa.fa-key
+			|${key}
 		.translation-context(title='Context')
-			i.fa.fa-comments 
-			${context}
+			i.fa.fa-comments
+			|${context}

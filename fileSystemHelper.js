@@ -1,6 +1,8 @@
 var fs = require('fs');
 var _ = require('underscore');
 var async = require('async');
+var mkdirp = require('mkdirp');
+var path = require('path');
 var archiver = require('archiver');
 
 function FileSystemHelper() {
@@ -9,7 +11,8 @@ function FileSystemHelper() {
 
 FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) {
 	var time = new Date();
-	var prefix = time.getDate() + '/' + time.getMonth() + '/' + time.getFullYear();
+	var root = __dirname + '/localisation/' + time.getDate() + time.getMonth() + time.getFullYear() + 
+				'/' + time.getHours() + time.getMinutes() + time.getSeconds();
 	var writtenLangs = 0;
 	var langsCount = Object.keys(localisation).length;
 	for(var lang in localisation) {
@@ -77,36 +80,45 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 		});
 		var toBeWrited = [
 			{
-				path: 'localisation/vis/soccer/' + lang + '.json',
-				content: JSON.stringify(visContent.soccer, null, 4)
+				path: '/vis/soccer/',
+				content: JSON.stringify(visContent.soccer, null, 4),
+				name: lang + '.json'
 			},			
 			{
-				path: 'localisation/vis/basketball/' + lang + '.json',
-				content: JSON.stringify(visContent.basketball, null, 4)
+				path: '/vis/basketball/',
+				content: JSON.stringify(visContent.basketball, null, 4),
+				name: lang + '.json'
 			},
 			{
-				path: 'localisation/vis/icehockey/' + lang + '.json',
-				content: JSON.stringify(visContent.icehockey, null, 4)
+				path: '/vis/icehockey/',
+				content: JSON.stringify(visContent.icehockey, null, 4),
+				name: lang + '.json'
 			},
 			{
-				path: 'localisation/vis/volleyball/' + lang + '.json',
-				content: JSON.stringify(visContent.volleyball, null, 4)
+				path: '/vis/volleyball/',
+				content: JSON.stringify(visContent.volleyball, null, 4),
+				name: lang + '.json'
 			},
 			{
-				path: 'localisation/csb/' + lang + '.json',
-				content: JSON.stringify(csbContent, null, 4)
+				path: '/csb/',
+				content: JSON.stringify(csbContent, null, 4),
+				name: lang + '.json'
 			},
 		];
 		async.each(toBeWrited, function (file, callback) {
-			fs.writeFile(file.path, JSON.stringify(file.content, null, 4), function (err) {
+			mkdirp(path.join(root + file.path), function (err) {
 				if (err) {
-					console.log(err);
+					console.error(err);
+				} else {
+					fs.writeFile(path.join(root, file.path, file.name), JSON.stringify(file.content, null, 4), function (err) {
+						if (err) {
+							console.log(err);
+						} else {
+							console.log(file.name + '.json was updated.');
+						}
+						callback();
+					});
 				}
-				else {
-					console.log(file.path + '.json was updated.');
-				}
-
-				callback();
 			});
 
 		}, function (err) {
@@ -121,19 +133,19 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 			}
 			writtenLangs++;
 			if(writtenLangs === langsCount) {
-				var outputPath = 'localisation.zip';
-				var output = fs.createWriteStream(outputPath);
+				var outputPath = path.join(root , 'localisation');
+				var output = fs.createWriteStream(outputPath + '.zip');
 				var zipArchive = archiver('zip');
 
 				output.on('close', function() {
 					console.log('done with the zip', outputPath);
-					callback();
+					callback(outputPath + '.zip');
 				});
 
 				zipArchive.pipe(output);
 
 				zipArchive.bulk([
-					{ src: [ '**/*.json' ], cwd: 'localisation/', expand: true }
+					{ src: [ '**/*.json' ], cwd: root, expand: true }
 				]);
 
 				zipArchive.finalize();

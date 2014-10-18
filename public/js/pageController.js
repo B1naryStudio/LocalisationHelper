@@ -103,6 +103,8 @@ var app = app || {};
 
 	PageController.prototype.getWorksheetsData = function() {
 		var item = $(this);
+		$('.worksheet.selected').toggleClass('selected', false);
+		$(this).toggleClass('selected', true);
 		var url = item.find('.worksheet-url').html();
 		var container = $('<div>').attr('id', 'translation-content').toggleClass('scrollBarInner', true);
 		self.$el.popup.toggleClass('visible', true);
@@ -119,7 +121,7 @@ var app = app || {};
 				});
 				self.$el.data.html(container);
 				var shadow = $('<div>').toggleClass('shadow', true);
-				container.append(shadow);
+				container.prepend(shadow);
 			} else {
 				console.log(response.error);
 			}
