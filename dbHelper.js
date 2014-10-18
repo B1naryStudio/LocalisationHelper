@@ -48,6 +48,7 @@ DbHelper.prototype.logTranslationUpdate = function(localisation) {
 			}
 		});
 };
+
 DbHelper.prototype.logTranslationAdd = function(localisation) {
 	this.insertLocalisation(localisation);
 	localisation.dateTime = new Date();
@@ -59,6 +60,19 @@ DbHelper.prototype.logTranslationAdd = function(localisation) {
 					localisation.key + ', lang: ' + localisation.lang);
 			} else {
 				console.log('Can\'t log localisation "Add". Reason: ' + err);
+			}
+		});
+};
+
+DbHelper.prototype.getLocalisationDiff = function(callback) {
+	this.db.collection('diff')
+		.find({})
+		.toArray(function(err, docs) {
+			var result = {};
+			if(err) {
+				callback(err, {status: 'error'});
+			} else {
+				callback(null, {status: 'ok', data: docs});
 			}
 		});
 };

@@ -1,6 +1,7 @@
 var request = require('request');
 
 function GoogleAuth() {
+	// this.scopes = 'https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+https://spreadsheets.google.com/feeds/';
 	this.scopes = 'https://spreadsheets.google.com/feeds';
 	this.clientId = '551651064595-to4iqmvl49qu2rf3v8d7dthpq1fnsfqk.apps.googleusercontent.com';
 	this.clientSecret = 'mzwMOMzkqrqVuUjQO-Js11Hp';
@@ -36,7 +37,7 @@ GoogleAuth.prototype.requestToken = function(req, callback) {
 			var parsed = JSON.parse(body);
 			console.log(parsed);
 			if(parsed.access_token && parsed.expires_in !== undefined){
-				callback(token);
+				callback(parsed.access_token);
 			} else {
 				callback(null);
 			}

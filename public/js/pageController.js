@@ -104,7 +104,7 @@ var app = app || {};
 	PageController.prototype.getWorksheetsData = function() {
 		var item = $(this);
 		var url = item.find('.worksheet-url').html();
-		var container = $('<div>').attr('id', 'translation-content');
+		var container = $('<div>').attr('id', 'translation-content').toggleClass('scrollBarInner', true);
 		self.$el.popup.toggleClass('visible', true);
 		$.get('/localisation', {url: url}, function(response) {
 			if(response.status === 'ok') {
@@ -118,7 +118,8 @@ var app = app || {};
 					container.append($translationItem);
 				});
 				self.$el.data.html(container);
-				// self.applyScrollbar(container);
+				var shadow = $('<div>').toggleClass('shadow', true);
+				container.append(shadow);
 			} else {
 				console.log(response.error);
 			}
@@ -191,12 +192,13 @@ var app = app || {};
 	PageController.prototype.applyTranslationChanges = function() {
 		var $translationItemContainer = $(this).closest('.translation-item');
 		var $textContainer = $translationItemContainer.find('.translation-value-text');
-		var initialData = $translationItemContainer.data('item');
-		initialData.translation = $textContainer.text();
+		var data = $translationItemContainer.data('item');
+		data.previousTranslation = data.translation;
+		data.translation = $textContainer.text();
 		$.ajax({
 			url: '/localisation',
 			type: 'PUT',
-			data: {item: initialData},
+			data: {item: data},
 			success: function(response) {
 				if(response.status === 'ok') {
 					$translationItemContainer.toggleClass('changed', false);

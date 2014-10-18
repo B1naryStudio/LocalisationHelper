@@ -31,6 +31,10 @@ app.get('/', checkToken, function(req, res) {
 	res.sendFile(staticDir + '/index2.html');
 });
 
+app.get('/admin', checkToken, function(req, res) {
+	res.sendFile(staticDir + '/admin.html')
+});
+
 app.get('/code', function(req, res) {
 	auth.requestToken(req, function(token) {
 		if(token) {
@@ -52,7 +56,7 @@ app.get('/localisation', function(req, res) {
 	var token = req.session.token;
 	spreadsheetsHelper.getWorksheetData(token, url, function(err, result) {
 		if(result.status === 'error') {
-			res.json({error: err})
+			res.json({error: err});
 		} else {
 			res.json(result);
 		}
@@ -64,7 +68,7 @@ app.put('/localisation', function(req, res) {
 	var token = req.session.token;
 	spreadsheetsHelper.updateLocalisation(token, item, function(err, result) {
 		if(result.status === 'error') {
-			res.json({error: err})
+			res.json({error: err});
 		} else {
 			res.json(result);
 		}
@@ -77,7 +81,7 @@ app.post('/localisation', function(req, res) {
 	var token = req.session.token;
 	spreadsheetsHelper.addNewLocalisation(token, key, item, function(err, result) {
 		if(result.status === 'error') {
-			res.json({error: err})
+			res.json({error: err});
 		} else {
 			res.json(result);
 		}
@@ -103,7 +107,17 @@ app.get('/history', function(req, res) {
 	var item = req.query.item;
 	dbHelper.getLocalisationHistory(item, function(err, result) {
 		if(result.status === 'error') {
-			res.json({error: err})
+			res.json({error: err});
+		} else {
+			res.json(result);
+		}
+	});
+});
+
+app.get('/diff', function(req, res) {
+	dbHelper.getLocalisationDiff(function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err});
 		} else {
 			res.json(result);
 		}
@@ -121,7 +135,7 @@ app.get('/worksheets', function(req, res) {
 	var token = req.session.token;
 	spreadsheetsHelper.getWorksheetsInfo(token, key, function(err, result) {
 		if(result.status === 'error') {
-			res.json({error: err})
+			res.json({error: err});
 		} else {
 			res.json(result);
 		}

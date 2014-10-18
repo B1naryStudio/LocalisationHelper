@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+	head
+		title Localisation Helper
+		link(rel="stylesheet", href="css/main.css")
+		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
+	body
+		#container.visible
+			button#create-zip
+						a(href="/zip?key=1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s") Get ZIP
+			button#get-diff Get DIFF
+			textarea#result(style="margin: 0px;width: 1019px;height: 477px;")
+
+	script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
+	script(type="text/javascript", src="lib/underscore.js")
+	script(type="text/javascript").
+		$(document).ready(function() {
+			$('#get-diff').click(function() {
+				$.getJSON('/diff', function(response) {
+					$('#result').text(JSON.stringify(response.data));
+				});
+			});
+		});

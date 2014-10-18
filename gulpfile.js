@@ -13,7 +13,7 @@ gulp.task('stylus', function() {
 });
 
 gulp.task('jade', function() {
-	gulp.src('./public/index2.jade')
+	gulp.src(['./public/index2.jade', './public/admin.jade'])
 		.pipe(jade())
 		.pipe(gulp.dest('./public/'));
 });
@@ -30,7 +30,7 @@ gulp.task('watch', function() {
 	gulp.watch('./public/styl/*.styl', function() {
 		gulp.run('stylus');
 	});
-	gulp.watch(['./public/index2.jade', './public/templates/*.jade'], function() {
+	gulp.watch(['./public/*.jade', './public/templates/*.jade'], function() {
 		gulp.run('jade');
 	});
 });
