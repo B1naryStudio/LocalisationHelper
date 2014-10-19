@@ -11,8 +11,9 @@ function FileSystemHelper() {
 
 FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) {
 	var time = new Date();
-	var root = __dirname + '/localisation/' + time.getDate() + time.getMonth() + time.getFullYear() + 
-				'/' + time.getHours() + time.getMinutes() + time.getSeconds();
+	var prefix = '' + time.getDate() + time.getMonth() + time.getFullYear() + 
+				'_' + time.getHours() + time.getMinutes() + time.getSeconds();
+	var root = __dirname + '/localisation/' + prefix;
 	var writtenLangs = 0;
 	var langsCount = Object.keys(localisation).length;
 	for(var lang in localisation) {
@@ -133,13 +134,13 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 			}
 			writtenLangs++;
 			if(writtenLangs === langsCount) {
-				var outputPath = path.join(root , 'localisation');
-				var output = fs.createWriteStream(outputPath + '.zip');
+				var outputPath = path.join(root , 'localisation_' + prefix + '.zip');
+				var output = fs.createWriteStream(outputPath);
 				var zipArchive = archiver('zip');
 
 				output.on('close', function() {
 					console.log('done with the zip', outputPath);
-					callback(outputPath + '.zip');
+					callback(outputPath);
 				});
 
 				zipArchive.pipe(output);

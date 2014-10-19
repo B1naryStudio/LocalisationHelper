@@ -1,6 +1,7 @@
 var request = require('request');
 var _ = require('underscore');
 var auth = require('./googleAuth');
+var async = require('async');
 var dbHelper = require('./dbHelper');
 
 function GoogleSpreadsheetsHelper() {
@@ -53,35 +54,33 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, ca
 GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(token, key, item, callback) {
 	this.getWorksheetsInfo(token, key, function(err, response) {
 		if(response.status === 'ok') {
-			var count = response.data.length;
-			var requestsFinished = 0;
-			if(!err) {
-				_.each(response.data, function(worksheet) {
-					var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
-									'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
-									'<gsx:context>' + item.context + '</gsx:context>' +
-									'<gsx:key>' + item.key + '</gsx:key>' +
-									'<gsx:originalvalue>' + item.originalValue + '</gsx:originalvalue>' +
-									'<gsx:project>' + item.project + '</gsx:project>' +
-									'<gsx:translation>' + item.translation + '</gsx:translation>' +
-								'</entry>';
-					var url = worksheet.link;
-					request.post({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
-						++requestsFinished;
-						if(err) {
-							console.log(err);
-						} else{
-							console.log('posted!');
-						}
-						if(count === requestsFinished) {
-							dbHelper.logTranslationAdd(item);
-							callback(null, {status: 'ok'});
-						}
-					}).auth(null, null, true, token);			
-				});
-			} else {
-				callback("Can't request worksheets data", {status: 'error'});
-			}			
+			async.each(response.data, function(worksheet, asyncCompleted) {
+				var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
+								'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
+								'<gsx:context>' + item.context + '</gsx:context>' +
+								'<gsx:key>' + item.key + '</gsx:key>' +
+								'<gsx:originalvalue>' + item.originalValue + '</gsx:originalvalue>' +
+								'<gsx:project>' + item.project + '</gsx:project>' +
+								'<gsx:translation>' + item.translation + '</gsx:translation>' +
+							'</entry>';
+				var url = worksheet.link;
+				request.post({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
+					if(err) {
+						console.log(err);
+					} else{
+						console.log('posted!');
+					}
+					asyncCompleted();
+				}).auth(null, null, true, token);	
+			}, function(err) {
+				if(err) {
+					console.log(err);
+					callback(err, {status: 'error'});
+				} else {						
+					dbHelper.logTranslationAdd(item);
+					callback(null, {status: 'ok'});
+				}
+			});
 		} else {
 			callback(err, response);
 		}
@@ -94,13 +93,10 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(token, key, cal
 	var result = {};
 	this.getWorksheetsInfo(token, key, function(err, response) {
 		if(response.status === 'ok') {
-			var count = response.data.length;
-			var requestsFinished = 0;
-			_.each(response.data, function(item) {
+			async.each(response.data, function(item, asyncCompleted) {
 				var url = item.link + '?alt=json';
-				var lang = item.lang;		
+				var lang = item.lang;
 				request.get(url, function(err, response, body) {
-					++requestsFinished;
 					if(!body) {
 						callback("Empty response", {status: 'error', data: []});
 					}
@@ -116,10 +112,15 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(token, key, cal
 					} else {
 						console.log('Error during parsing ' + lang);
 					}
-					if(count === requestsFinished) {
-						callback(null, {status: 'ok', data: result});
-					}
-				}).auth(null, null, true, token);
+					asyncCompleted();
+				}).auth(null, null, true, token);				
+			}, function(err) {
+				if(err) {
+					console.log(err);
+					callback(err, {status: 'error'});
+				} else {
+					callback(null, {status: 'ok', data: result});
+				}
 			});
 		} else {
 			callback(err, response);

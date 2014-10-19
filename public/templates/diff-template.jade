@@ -1,0 +1,25 @@
+script#diff-template(type="text/x-jQuery-tmpl")
+	#diff-items.scrollBarInner
+		.diff-update-section
+			|{{each update}}
+			.diff-item-update-lang ${$index}
+			|{{each $value}}			
+			.diff-item-update
+				| *
+				span.diff-item-update-lang ${$value.lang} 
+				span.diff-item-update-key ${$value.key} 
+				span.diff-item-update-old-value ${$value.previousTranslation} 
+				span.diff-item-update-new-value ${$value.translation} 
+			|{{/each}}
+			|{{/each}}
+		.diff-add-section
+			|{{each add}}
+			.diff-item-update-project ${$index}
+			|{{each $value}}
+			.diff-item-add
+				| +
+				span.diff-item-add-project ${$value.project} 
+				span.diff-item-add-key ${$value.key} 
+				span.diff-item-add-original-value ${$value.originalValue} 
+			|{{/each}}
+			|{{/each}}

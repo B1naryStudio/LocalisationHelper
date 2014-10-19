@@ -48,8 +48,8 @@ Scrollbars
     width: 15px;
     background: rgba(244, 34, 34, 0);
     overflow:visible;
-
 }
+
 ::-webkit-scrollbar-thumb:vertical {
     height: 1px;
     background-color: rgba(0,0,0,0.2);
@@ -60,32 +60,6 @@ Scrollbars
 }
 ::-webkit-scrollbar-thumb:vertical:hover {
     background-color: rgba(0,0,0,0.4);
-}
-.option_2 .scrollBarInner::-webkit-scrollbar-button, .option_3 .scrollBarInner::-webkit-scrollbar-button{
-    display: block;
-    width:15px;
-    height:15px;
-    opacity:0;
-}
-.option_2 .scrollBarInner::-webkit-scrollbar-button:end:decrement, .option_3 .scrollBarInner::-webkit-scrollbar-button:start:decrement{
-    background:url('../images/scroller_arrow_up.png');
-}
-.option_2 .scrollBarInner::-webkit-scrollbar-button:end:increment, .option_3 .scrollBarInner::-webkit-scrollbar-button:end:increment{
-    background:url('../images/scroller_arrow_down.png');
-}
-.option_2 .scrollBarInner::-webkit-scrollbar-button:end:decrement:hover, .option_3 .scrollBarInner::-webkit-scrollbar-button:start:decrement:hover{
-    background:url('../images/scroller_arrow_up_over.png');
-}
-.option_2 .scrollBarInner::-webkit-scrollbar-button:end:increment:hover, .option_3 .scrollBarInner::-webkit-scrollbar-button:end:increment:hover{
-    background:url('../images/scroller_arrow_down_over.png');
-}
-.option_2 .scrollBarInner::-webkit-scrollbar-button:start:decrement,
-.option_2 .scrollBarInner::-webkit-scrollbar-button:start:increment,
-.option_3 .scrollBarInner::-webkit-scrollbar-button:start:increment{
-    display:none;
-}
-.option_3 .scrollBarInner::-webkit-scrollbar-button:end:decrement{
-    display:none;
 }
 
 #login-form, #localisation-new
@@ -224,7 +198,6 @@ input
 	width 85%
 	float left
 	height 90%
-	overflow-y: auto
 	overflow-scrolling: touch
 
 .translation-item, .history-translation-item
@@ -241,7 +214,6 @@ input
 	&.changed
 		box-shadow: 0 0 3px 1px #FF0A0A
 		border: 1px solid rgb(255, 108, 108)
-		/*background rgba(255,0,0,0.3)*/
 		.translation-actions
 			display block
 
@@ -254,7 +226,6 @@ input
 		right 0
 		padding 4px
 	&:hover
-		//box-shadow 0px 0px 3px 1px #1961CC
 		background-color: #F4F4F4
 
 		.translation-history
@@ -437,3 +408,17 @@ input
 		box-shadow: 0em -3em 0em 0em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 0em #ffffff, -2em -2em 0 0.2em #ffffff
 	}
 }
+
+/// Admin page ///
+
+#container
+	#navmenu
+		width 15%
+		float left
+		button
+			width 90%
+			margin 5px 5%
+
+	#content
+		width 80%
+		float left

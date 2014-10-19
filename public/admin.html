@@ -1,7 +1,24 @@
-<!DOCTYPE html><html lang="en"><head><title>Localisation Helper</title><link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"></head><body><div id="container" class="visible"><button id="create-zip"><a href="/zip?key=1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s">Get ZIP</a></button><button id="get-diff">Get DIFF</button><textarea id="result" style="margin: 0px;width: 1019px;height: 477px;"></textarea></div></body><script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script><script type="text/javascript" src="lib/underscore.js"></script><script type="text/javascript">$(document).ready(function() {
+<!DOCTYPE html><html lang="en"><head><title>Localisation Helper</title><link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"></head><body><div id="container" class="visible"><div id="navmenu"><button id="go-to-manager"><a href="/">Manager</a></button><button id="create-zip"><a href="/zip?key=1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s">Get ZIP</a></button><button id="get-diff">Get DIFF</button></div><div id="content" class="scrollBarBox"><textarea id="result" style="margin: 0px;width: 1019px;height: 477px;"></textarea></div></div><script id="diff-template" type="text/x-jQuery-tmpl"><div id="diff-items" class="scrollBarInner"><div class="diff-update-section">{{each update}}<div class="diff-item-update-lang">${$index}</div>{{each $value}}			<div class="diff-item-update">*<span class="diff-item-update-lang">${$value.lang} </span><span class="diff-item-update-key">${$value.key} </span><span class="diff-item-update-old-value">${$value.previousTranslation} </span><span class="diff-item-update-new-value">${$value.translation} </span></div>{{/each}}
+{{/each}}</div><div class="diff-add-section">{{each add}}<div class="diff-item-update-project">${$index}</div>{{each $value}}<div class="diff-item-add">+<span class="diff-item-add-project">${$value.project} </span><span class="diff-item-add-key">${$value.key} </span><span class="diff-item-add-original-value">${$value.originalValue} </span></div>{{/each}}
+{{/each}}</div></div></script><script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script><script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script><script type="text/javascript" src="lib/underscore.js"></script><script type="text/javascript">$(document).ready(function() {
 	$('#get-diff').click(function() {
 		$.getJSON('/diff', function(response) {
-			$('#result').text(JSON.stringify(response.data));
+			if(response.status === 'ok') {
+				var data = response.data;
+				var update = _.groupBy(_.where(data, {type: 'update'}), function(item) {
+					return item.lang;
+				});
+				var add = _.groupBy(_.where(data, {type: 'add'}), function(item) {
+					return item.project;
+				});
+				data = {
+					update: update,
+					add: add
+				};
+
+				var template = $('#diff-template');
+				$('#content').html(template.tmpl(data));
+			}
 		});
 	});
-});</script></html>
+});</script></body></html>

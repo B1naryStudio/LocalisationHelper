@@ -38,7 +38,6 @@ app.get('/admin', checkToken, function(req, res) {
 		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
 		return res.send(401);
 	}
-	res.sendFile(staticDir + '/admin.html');
 });
 
 app.get('/code', function(req, res) {
