@@ -11,15 +11,17 @@ html(lang="en")
 			#data-controls-panel
 				#language-controls
 					input#language-search(type='text', placeholder="Search by language")
-					button#create-new-localisation New Key
+					button#create-new-localisation New
 					button#go-to-admin
 						a(href="/admin") Admin
+					button#change-spreadsheet
+						a(href="/") Change
 				#localisation-controls
+					input#localisation-search(type='text', placeholder="Search by translations, keys...")
 					label(for='localisation-changed-only') Show changed only
 					input#localisation-changed-only(type='checkbox')
 					label(for='localisation-missed-only') Show missed only
 					input#localisation-missed-only(type='checkbox')
-					input#localisation-search(type='text', placeholder="Search by translations, keys...")
 			#worksheets.scrollBarBox
 			#data.scrollBarBox
 		#popup.visible
@@ -35,6 +37,7 @@ html(lang="en")
 				li#history
 				li#localisation-new
 					div
+						h2 New key
 						div
 							select#localisation-project
 								option(value="CSB") CSB 

@@ -74,9 +74,9 @@ DbHelper.prototype.logTranslationAdd = function(localisation) {
 		});
 };
 
-DbHelper.prototype.getLocalisationDiff = function(callback) {
+DbHelper.prototype.getLocalisationDiff = function(range, callback) {
 	this.db.collection('diff')
-		.find({})
+		.find({$and: [{createdAt: {$gte: range.from}}, {createdAt: {$lte: range.to}}]})
 		.toArray(function(err, docs) {
 			var result = {};
 			if(err) {

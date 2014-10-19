@@ -1,8 +1,20 @@
-<!DOCTYPE html><html lang="en"><head><title>Localisation Helper</title><link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"></head><body><div id="container" class="visible"><div id="navmenu"><button id="go-to-manager"><a href="/">Manager</a></button><button id="create-zip"><a href="/zip?key=1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s">Get ZIP</a></button><button id="get-diff">Get DIFF</button></div><div id="content" class="scrollBarBox"><textarea id="result" style="margin: 0px;width: 1019px;height: 477px;"></textarea></div></div><script id="diff-template" type="text/x-jQuery-tmpl"><div id="diff-items" class="scrollBarInner"><div class="diff-update-section">{{each update}}<div class="diff-item-update-lang">${$index}</div>{{each $value}}			<div class="diff-item-update">*<span class="diff-item-update-lang">${$value.lang} </span><span class="diff-item-update-key">${$value.key} </span><span class="diff-item-update-old-value">${$value.previousTranslation} </span><span class="diff-item-update-new-value">${$value.translation} </span></div>{{/each}}
-{{/each}}</div><div class="diff-add-section">{{each add}}<div class="diff-item-update-project">${$index}</div>{{each $value}}<div class="diff-item-add">+<span class="diff-item-add-project">${$value.project} </span><span class="diff-item-add-key">${$value.key} </span><span class="diff-item-add-original-value">${$value.originalValue} </span></div>{{/each}}
-{{/each}}</div></div></script><script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script><script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script><script type="text/javascript" src="lib/underscore.js"></script><script type="text/javascript">$(document).ready(function() {
+<!DOCTYPE html><html lang="en"><head><title>Localisation Helper</title><link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/datetime.css"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"></head><body><div id="container" class="visible"><div id="navmenu"><button id="go-to-manager"><a href="/">Manager</a></button><button id="create-zip"><a href="/zip?key=1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s">Get ZIP</a></button><input id="date-from" type="text" readonly><input id="date-to" type="text" readonly><button id="get-diff">Get DIFF</button></div><div id="content" class="scrollBarBox"></div></div><script id="diff-template" type="text/x-jQuery-tmpl"><div id="diff-items" class="scrollBarInner"><div class="diff-update-section">{{each update}}<div class="diff-item-update-lang">${$index}</div>{{each $value}}			<div class="diff-item-update">*<span class="diff-item-update-lang">${$value.lang} </span><span class="diff-item-update-key">${$value.key} </span><span class="diff-item-update-old-value">${$value.previousTranslation} </span><span class="diff-item-update-new-value">${$value.translation} </span><span class="diff-item-update-date">${$value.createdAt} </span></div>{{/each}}
+{{/each}}</div><div class="diff-add-section">{{each add}}<div class="diff-item-update-project">${$index}</div>{{each $value}}<div class="diff-item-add">+<span class="diff-item-add-project">${$value.project} </span><span class="diff-item-add-key">${$value.key} </span><span class="diff-item-add-original-value">${$value.originalValue} </span><span class="diff-item-update-date">${$value.createdAt} </span></div>{{/each}}
+{{/each}}</div></div></script><script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script><script type="text/javascript" src="lib/datetime.js"></script><script type="text/javascript" src="lib/jdatetime.js"></script><script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script><script type="text/javascript" src="lib/underscore.js"></script><script type="text/javascript">$(document).ready(function() {
+	var content = $('#content');
+	$('#date-from, #date-to').pikaday({
+		firstDay: 1,
+		minDate: new Date('2000-01-01'),
+		maxDate: new Date('2020-12-31'),
+		defaultDate: new Date(),
+		setDefaultDate : new Date(),
+		yearRange: [2000,2020],
+		format: 'YYYY-MM-DD',
+	});
 	$('#get-diff').click(function() {
-		$.getJSON('/diff', function(response) {
+		var from = $('#date-from').val();
+		var to = $('#date-to').val();
+		$.getJSON('/diff', {from: from, to: to}, function(response) {
 			if(response.status === 'ok') {
 				var data = response.data;
 				var update = _.groupBy(_.where(data, {type: 'update'}), function(item) {
@@ -17,7 +29,9 @@
 				};
 
 				var template = $('#diff-template');
-				$('#content').html(template.tmpl(data));
+				content.html(template.tmpl(data));
+			} else {
+				content.html(response.error);
 			}
 		});
 	});

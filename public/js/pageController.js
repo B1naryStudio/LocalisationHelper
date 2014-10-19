@@ -61,8 +61,8 @@ var app = app || {};
 	}
 
 	function clearFade() {
-		self.$el.popup.toggleClass('visible', false);
 		self.$el.popup.find('.visible').toggleClass('visible', false);
+		self.$el.popup.toggleClass('visible', false);
 	}
 
 	PageController.prototype.showOnlyModified = function() {

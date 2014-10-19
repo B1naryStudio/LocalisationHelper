@@ -3,6 +3,7 @@ html(lang="en")
 	head
 		title Localisation Helper
 		link(rel="stylesheet", href="css/main.css")
+		link(rel="stylesheet", href="css/datetime.css")
 		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
 	body
 		#container.visible
@@ -11,18 +12,33 @@ html(lang="en")
 					a(href="/") Manager
 				button#create-zip
 					a(href="/zip?key=1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s") Get ZIP
+				input#date-from(type="text", readonly)
+				input#date-to(type="text", readonly)
 				button#get-diff Get DIFF
 			#content.scrollBarBox
-				textarea#result(style="margin: 0px;width: 1019px;height: 477px;")
 
 		include templates/diff-template
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
+		script(type="text/javascript", src="lib/datetime.js")
+		script(type="text/javascript", src="lib/jdatetime.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
 		script(type="text/javascript", src="lib/underscore.js")
 		script(type="text/javascript").
 			$(document).ready(function() {
+				var content = $('#content');
+				$('#date-from, #date-to').pikaday({
+					firstDay: 1,
+					minDate: new Date('2000-01-01'),
+					maxDate: new Date('2020-12-31'),
+					defaultDate: new Date(),
+					setDefaultDate : new Date(),
+					yearRange: [2000,2020],
+					format: 'YYYY-MM-DD',
+				});
 				$('#get-diff').click(function() {
-					$.getJSON('/diff', function(response) {
+					var from = $('#date-from').val();
+					var to = $('#date-to').val();
+					$.getJSON('/diff', {from: from, to: to}, function(response) {
 						if(response.status === 'ok') {
 							var data = response.data;
 							var update = _.groupBy(_.where(data, {type: 'update'}), function(item) {
@@ -37,7 +53,9 @@ html(lang="en")
 							};
 
 							var template = $('#diff-template');
-							$('#content').html(template.tmpl(data));
+							content.html(template.tmpl(data));
+						} else {
+							content.html(response.error);
 						}
 					});
 				});

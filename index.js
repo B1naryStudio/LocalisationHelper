@@ -120,7 +120,15 @@ app.get('/history', function(req, res) {
 });
 
 app.get('/diff', function(req, res) {
-	dbHelper.getLocalisationDiff(function(err, result) {
+	try {
+		var from = new Date(req.query.from);
+		var to = new Date(req.query.to);
+	} catch(e) {
+		res.json(e);
+		return;
+	}
+	var range = {from: from, to: to};
+	dbHelper.getLocalisationDiff(range, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err});
 		} else {

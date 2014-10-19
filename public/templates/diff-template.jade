@@ -10,6 +10,7 @@ script#diff-template(type="text/x-jQuery-tmpl")
 				span.diff-item-update-key ${$value.key} 
 				span.diff-item-update-old-value ${$value.previousTranslation} 
 				span.diff-item-update-new-value ${$value.translation} 
+				span.diff-item-update-date ${$value.createdAt} 
 			|{{/each}}
 			|{{/each}}
 		.diff-add-section
@@ -21,5 +22,6 @@ script#diff-template(type="text/x-jQuery-tmpl")
 				span.diff-item-add-project ${$value.project} 
 				span.diff-item-add-key ${$value.key} 
 				span.diff-item-add-original-value ${$value.originalValue} 
+				span.diff-item-update-date ${$value.createdAt} 
 			|{{/each}}
 			|{{/each}}
