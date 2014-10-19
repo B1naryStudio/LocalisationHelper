@@ -1,0 +1,16 @@
+script#history-translation-template
+	#history-items
+		#history-header ${header}
+		#history-body.scrollBarInner
+			|{{each content}}
+			.history-translation-item
+				.history-translation-value(title='Translation')
+					i.fa.fa-refresh 
+					| ${$value.translation}
+				.history-translation-changed(title='Change date')
+					i.fa.fa-calendar 
+					| ${$value.createdAt}
+			|{{/each content}}
+		#close-button-container
+			button#close-button
+				i.fa.fa-arrow-left Back

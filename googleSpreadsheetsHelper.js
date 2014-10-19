@@ -43,7 +43,7 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, ca
 			callback(err, {status: 'error'});
 		} else if(body.indexOf(item.translation) > -1) {
 			dbHelper.logTranslationUpdate(item);
-			callback(null, {status: 'ok'});
+			callback(null, {status: 'ok'}); // TODO update edit link
 		} else {
 			callback('Smth wrong during google API request.', {status: 'error'});
 		}
