@@ -7,7 +7,7 @@ var spreadsheetsHelper = require('./googleSpreadsheetsHelper');
 var fileSystemHelper = require('./fileSystemHelper');
 var googleAuth = require('./googleAuth');
 var dbHelper = require('./dbHelper');
-var auth = require('basic-auth');
+var basicAuth = require('basic-auth');
 var staticDir = __dirname + '/public';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
@@ -17,7 +17,6 @@ app.use(bodyParser.json())
 app.use(session({secret: 'localisation secret'}))
 
 dbHelper.initialize(app.get('db-uri'));
-
 
 function checkToken(req, res, next) {
 	if(req.session.token) {
@@ -32,12 +31,13 @@ app.get('/', checkToken, function(req, res) {
 });
 
 app.get('/admin', checkToken, function(req, res) {
-	// var credentials = auth(req);
-	// if(credentials.name === 'test' && credentials.pass === 'test') {
-	// 	res.sendFile(staticDir + '/admin.html');
-	// } else {
-	// 	res.status(401).end();
-	// }
+	var user = basicAuth(req);
+	if(user && user.name === 'test' && user.pass === 'test') {
+		res.sendFile(staticDir + '/admin.html');
+	} else {
+		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		return res.send(401);
+	}
 	res.sendFile(staticDir + '/admin.html');
 });
 
