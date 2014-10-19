@@ -4,6 +4,7 @@ var async = require('async');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var archiver = require('archiver');
+var asyncEachObject = require('async-each-object');
 
 function FileSystemHelper() {
 
@@ -14,12 +15,9 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 	var prefix = '' + time.getDate() + time.getMonth() + time.getFullYear() + 
 				'_' + time.getHours() + time.getMinutes() + time.getSeconds();
 	var root = __dirname + '/localisation/' + prefix;
-	var writtenLangs = 0;
-	var langsCount = Object.keys(localisation).length;
-	for(var lang in localisation) {
-		var currentLoc = localisation[lang];
-		var vis = _.where(currentLoc, {project: 'VIS'});
-		var csb = _.where(currentLoc, {project: 'CSB'});
+	async.eachObject(localisation, function(value, lang, done) {
+		var vis = _.where(value, {project: 'VIS'});
+		var csb = _.where(value, {project: 'CSB'});
 		var visContent = {
 			soccer: {
 				stats: {},
@@ -106,7 +104,7 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 				name: lang + '.json'
 			},
 		];
-		async.each(toBeWrited, function (file, callback) {
+		async.each(toBeWrited, function (file, asyncCompleted) {
 			mkdirp(path.join(root + file.path), function (err) {
 				if (err) {
 					console.error(err);
@@ -115,44 +113,42 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 						if (err) {
 							console.log(err);
 						} else {
-							console.log(file.name + '.json was updated.');
+							console.log(file.name + ' in' + file.path + ' was updated.');
 						}
-						callback();
+						asyncCompleted();
 					});
 				}
 			});
 
 		}, function (err) {
-
 			if (err) {
 				// One of the iterations produced an error.
 				// All processing will now stop.
 				console.log('A file failed to process');
 			}
 			else {
-				console.log('All files have been processed successfully');
+				console.log('Wrote lang: ' + lang);
 			}
-			writtenLangs++;
-			if(writtenLangs === langsCount) {
-				var outputPath = path.join(root , 'localisation_' + prefix + '.zip');
-				var output = fs.createWriteStream(outputPath);
-				var zipArchive = archiver('zip');
-
-				output.on('close', function() {
-					console.log('done with the zip', outputPath);
-					callback(outputPath);
-				});
-
-				zipArchive.pipe(output);
-
-				zipArchive.bulk([
-					{ src: [ '**/*.json' ], cwd: root, expand: true }
-				]);
-
-				zipArchive.finalize();
-			}
+			done();
 		});
-	}	
+	}, function(err) {
+		var outputPath = path.join(root , 'localisation_' + prefix + '.zip');
+		var output = fs.createWriteStream(outputPath);
+		var zipArchive = archiver('zip');
+
+		output.on('close', function() {
+			console.log('done with the zip: ', outputPath);
+			callback(outputPath);
+		});
+
+		zipArchive.pipe(output);
+
+		zipArchive.bulk([
+			{ src: [ '**/*.json' ], cwd: root, expand: true }
+		]);
+
+		zipArchive.finalize();		
+	});
 };
 
 module.exports = new FileSystemHelper();

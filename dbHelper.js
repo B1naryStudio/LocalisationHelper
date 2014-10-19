@@ -1,6 +1,7 @@
 var mongo = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
+var async = require('async');
 
 function DbHelper() {};
 
@@ -18,11 +19,20 @@ DbHelper.prototype.initialize = function(uri) {
 DbHelper.prototype.insertLocalisations = function(records) {
 	var localisation = this.db.collection('localisation');
 	for(var lang in records) {
-		_.each(records[lang], function(item) {
+		async.each(records[lang], function(item, asyncCompleted) {
 			item.createdAt = new Date();
 			localisation.insert(item, function(err, docs) {
-				console.log('wrote ' + JSON.stringify(item));
+				if(err) {
+					console.log('err');
+				}
+				asyncCompleted();
 			});
+		}, function(err) {
+			if(err) {
+				console.log(err);
+			} else {
+				console.log('Inserted localisation snapshot, lang:' + lang);
+			}
 		});
 	}
 };
@@ -57,7 +67,7 @@ DbHelper.prototype.logTranslationAdd = function(localisation) {
 		insert(localisation, function(err, docs) {
 			if(!err) {
 				console.log('Logged localisation "Add". Key: ' + 
-					localisation.key + ', lang: ' + localisation.lang);
+					localisation.key);
 			} else {
 				console.log('Can\'t log localisation "Add". Reason: ' + err);
 			}
