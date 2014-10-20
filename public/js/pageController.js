@@ -126,6 +126,7 @@ var app = app || {};
 		$.get('/localisation', {url: url}, function(response) {
 			if(response.status === 'ok') {
 				clearFade();
+				alertify.success("Loaded " + item.html());
 				var list = response.data;
 				list.forEach(function(item) {
 					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
@@ -138,6 +139,7 @@ var app = app || {};
 				var shadow = $('<div>').toggleClass('shadow', true);
 				container.prepend(shadow);
 			} else {
+				alertify.error(response.error);
 				console.log(response.error);
 			}
 		});
@@ -150,6 +152,7 @@ var app = app || {};
 		$.get('/worksheets', {key: key}, function(response) {
 			if(response.status === 'ok') {
 				clearFade();
+				alertify.success("Spreadsheet loaded");
 				var list = response.data;
 				var container = $('<div>').toggleClass('scrollBarInner', true);
 				self.$el.container.show();
@@ -160,6 +163,7 @@ var app = app || {};
 				});
 				self.$el.worksheets.append(container);
 			} else {
+				alertify.error(response.error);
 				console.log(response.error);
 			}
 		});
@@ -198,6 +202,7 @@ var app = app || {};
 					self.$el.history.append(html);
 					fadeScreen('history');
 				} else {
+					alertify.error(response.error);
 					console.log(response.error);
 				}
 			});
@@ -219,13 +224,16 @@ var app = app || {};
 				if(response.status === 'ok') {
 					$translationItemContainer.toggleClass('changed', false);
 					$textContainer.data('default', $textContainer.text());
+					alertify.success("Changes has been applied");
 				} else {
-					alert(response.error);
+					alertify.error(response.error);
+					console.log(response.error);
 				}
 				clearFade();
 			},
 			error: function(err) {
-				alert(err);
+				alertify.error(err);
+				console.log(err);
 				clearFade();
 			}
 		});
@@ -236,7 +244,8 @@ var app = app || {};
 		var $textContainer = $translationItemContainer.find('.translation-value-text');
 		var defaultText = $textContainer.data('default');
 		$translationItemContainer.toggleClass('changed', false);
-		$textContainer.text(defaultText);	
+		$textContainer.text(defaultText);
+		alertify.log("Canceled changes");
 	};
 
 	PageController.prototype.onTranslationTextChanged = function() {
@@ -266,9 +275,11 @@ var app = app || {};
 		var key = self.$el.spreadsheetKey.val();
 		fadeScreen('spinner');
 		$.post('/localisation', {item: item, key: key}, function(response) {
-			if(response.status === 'ok') {				
+			if(response.status === 'ok') {
+				alertify.success("Key has been successfully added");
 				console.log(JSON.stringify(response));
 			} else {
+				alertify.error(response.error);
 				console.log(response.error);
 			}
 			clearFade();
