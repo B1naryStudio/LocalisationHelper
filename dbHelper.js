@@ -2,8 +2,21 @@ var mongo = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
 var async = require('async');
+var moment = require('moment');
 
 function DbHelper() {};
+
+function formatDates(docs) {
+	return _.map(docs, function(item) {
+		if(item.createdAt) {
+			item.createdAt = moment(item.createdAt).format('MMMM Do YYYY, h:mm:ss a');
+		}
+		if(item.dateTime) {
+			item.dateTime = moment(item.dateTime).format('MMMM Do YYYY, h:mm:ss a');
+		}
+		return item;
+	});
+}
 
 DbHelper.prototype.initialize = function(uri) {
 	var self = this;
@@ -82,7 +95,7 @@ DbHelper.prototype.getLocalisationDiff = function(range, callback) {
 			if(err) {
 				callback(err, {status: 'error'});
 			} else {
-				callback(null, {status: 'ok', data: docs});
+				callback(null, {status: 'ok', data: formatDates(docs)});
 			}
 		});
 };
@@ -95,7 +108,7 @@ DbHelper.prototype.getLocalisationHistory = function(localisation, callback) {
 			if(err) {
 				callback(err, {status: 'error'});
 			} else {
-				callback(null, {status: 'ok', data: docs});
+				callback(null, {status: 'ok', data: formatDates(docs)});
 			}
 		});
 };

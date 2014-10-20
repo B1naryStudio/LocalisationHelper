@@ -15,6 +15,8 @@ app.use(express.static(staticDir));
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(session({secret: 'localisation secret'}))
+app.set('views', staticDir);
+app.set('view engine', 'jade');
 
 dbHelper.initialize(app.get('db-uri'));
 
@@ -27,16 +29,21 @@ function checkToken(req, res, next) {
 } 
 
 app.get('/', checkToken, function(req, res) {
-	res.sendFile(staticDir + '/index2.html');
+	res.render('index.jade');
 });
 
 app.get('/admin', checkToken, function(req, res) {
 	var user = basicAuth(req);
 	if(user && user.name === 'test' && user.pass === 'test') {
-		res.sendFile(staticDir + '/admin.html');
+		var key = req.session.key;
+		if(key) {
+			res.render('admin.jade', {key: key});
+		} else {
+			res.redirect('/');
+		}
 	} else {
 		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-		return res.send(401);
+		return res.send(401).end();
 	}
 });
 
@@ -145,11 +152,12 @@ app.get('/latest', function(req, res) {
 
 app.get('/worksheets', function(req, res) {
 	var key = req.query.key;
-	var token = req.session.token;
+	var token = req.session.token;	
 	spreadsheetsHelper.getWorksheetsInfo(token, key, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err});
 		} else {
+			req.session.key = key;
 			res.json(result);
 		}
 	});

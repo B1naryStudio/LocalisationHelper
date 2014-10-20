@@ -16,6 +16,7 @@ var app = app || {};
 			spreadsheetKey  : $('#sp-key-value'),
 			newLocalisation : $('#localisation-new'),
 			locKey          : $('#localisation-key'),
+			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
 			locOriginal     : $('#localisation-original'),
@@ -54,10 +55,16 @@ var app = app || {};
 
 	function fadeScreen(elName) {
 		clearFade();
-		if(self.$el[elName]) {
-			self.$el[elName].toggleClass('visible', true);
-		}
 		self.$el.popup.toggleClass('visible', true);
+		if(elName !== 'spinner') {
+			setTimeout(function() {
+				if(self.$el[elName]) {
+					self.$el[elName].toggleClass('visible', true);
+				}
+			}, 100);
+		} else {
+			self.$el.spinner.toggleClass('visible', true);
+		}
 	}
 
 	function clearFade() {
@@ -138,6 +145,7 @@ var app = app || {};
 
 	PageController.prototype.loadSpreadsheet = function() {
 		var key = self.$el.spreadsheetKey.val();
+		self.$el.leftMenu.show();
 		fadeScreen('spinner');
 		$.get('/worksheets', {key: key}, function(response) {
 			if(response.status === 'ok') {
@@ -264,16 +272,6 @@ var app = app || {};
 				console.log(response.error);
 			}
 			clearFade();
-		});
-	};
-
-	PageController.prototype.applyScrollbar = function(container) {
-		container.mCustomScrollbar({
-			theme: 'dark-3',
-			scrollButtons: { enable: true },
-			updateOnContentResize: true,
-			advanced: { updateOnSelectorChange: "true" },
-			scrollInertia: 0
 		});
 	};
 

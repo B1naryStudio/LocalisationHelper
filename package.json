@@ -22,7 +22,9 @@
     "express-session": "~1.9.0",
     "mkdirp": "~0.5.0",
     "basic-auth": "~1.0.0",
-    "async-each-object": "0.0.2"
+    "async-each-object": "0.0.2",
+    "jade": "~1.7.0",
+    "moment": "~2.8.3"
   },
   "devDependencies": {
     "gulp": "^3.8.8",

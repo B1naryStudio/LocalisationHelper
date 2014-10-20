@@ -20,12 +20,12 @@ gulp.task('jade', function() {
 
 gulp.task('default', function() {
 	gulp.run('stylus');
-	gulp.run('jade');
+	// gulp.run('jade');
 });
 
 gulp.task('watch', function() {
 	gulp.run('stylus');
-	gulp.run('jade');
+	// gulp.run('jade');
 
 	gulp.watch('./public/styl/*.styl', function() {
 		gulp.run('stylus');

@@ -3,7 +3,6 @@ html(lang="en")
 	head
 		title Localisation Helper
 		link(rel="stylesheet", href="css/main.css")
-		link(rel="stylesheet", href="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.min.css")
 		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:700,400', type='text/css')
 	body
@@ -11,11 +10,6 @@ html(lang="en")
 			#data-controls-panel
 				#language-controls
 					input#language-search(type='text', placeholder="Search by language")
-					button#create-new-localisation New
-					button#go-to-admin
-						a(href="/admin") Admin
-					button#change-spreadsheet
-						a(href="/") Change
 				#localisation-controls
 					input#localisation-search(type='text', placeholder="Search by translations, keys...")
 					label(for='localisation-changed-only') Show changed only
@@ -24,6 +18,15 @@ html(lang="en")
 					input#localisation-missed-only(type='checkbox')
 			#worksheets.scrollBarBox
 			#data.scrollBarBox
+		#left-button-section
+			#create-new-localisation(title="New Key")
+				i.fa.fa-plus
+			#go-to-admin(title="Admin Page")
+				a(href="/admin")
+					i.fa.fa-cogs
+			#change-spreadsheet(title="Change spreadsheet key")
+				a(href="/") 
+					i.fa.fa-repeat
 		#popup.visible
 			ul.source-list
 				li#login-form
@@ -42,10 +45,10 @@ html(lang="en")
 							select#localisation-project
 								option(value="CSB") CSB 
 								option(value="VIS") VIS
-						input#localisation-key(placeholder="Key", value="Key") 
-						input#localisation-context(placeholder="Context", value="Context") 
-						input#localisation-original(placeholder="Original value (English)", value="Original value (English)") 
-						input#localisation-translation(placeholder="Translation", value="Translation") 
+						input#localisation-key(placeholder="Key", value="") 
+						input#localisation-context(placeholder="Context", value="") 
+						input#localisation-original(placeholder="Original value (English)", value="") 
+						input#localisation-translation(placeholder="Translation", value="") 
 						div#buttons-section
 							button#localisation-new-cancel Close
 							button#localisation-new-ok Create
@@ -53,7 +56,7 @@ html(lang="en")
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
 		script(type="text/javascript", src="lib/underscore.js")
-		script(type="text/javascript", src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js")
+		script(type="text/javascript", src="lib/moment.js")
 		script(type="text/javascript", src="js/pageController.js")
 		script(type="text/javascript", src="js/main.js")
 		include templates/history-translation-template
