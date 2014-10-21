@@ -109,7 +109,7 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 				if (err) {
 					console.error(err);
 				} else {
-					fs.writeFile(path.join(root, file.path, file.name), JSON.stringify(file.content, null, 4), function (err) {
+					fs.writeFile(path.join(root, file.path, file.name), file.content, function (err) {
 						if (err) {
 							console.log(err);
 						} else {
