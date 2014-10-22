@@ -1,9 +1,14 @@
-var request = require('request');
+var request = require('google-oauth-jwt').requestWithJWT();
 var _ = require('underscore');
-var auth = require('./googleAuth');
 var async = require('async');
 var dbHelper = require('./dbHelper');
 var XML = require("node-jsxml").XML;
+
+var jwt = {
+	email: '551651064595-5i2ca0ck9bnh7v02qddn92frgi8g8gr9@developer.gserviceaccount.com',
+	keyFile: 'private-key.pem',
+	scopes: ['https://spreadsheets.google.com/feeds']
+};
 
 function GoogleSpreadsheetsHelper() {
 	this.root = 'https://spreadsheets.google.com/feeds';
@@ -28,7 +33,7 @@ function parseLocalisationList(entries, lang) {
 };
 
 // updates existing localisation key
-GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, callback) {
+GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback) {
 	var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
 					'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
 					'<id>' + item.id + '</id>' +
@@ -39,7 +44,7 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, ca
 					'<gsx:translation>' + item.translation + '</gsx:translation>' +
 				'</entry>';
 	var url = item.editLink;
-	request.put({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
+	request.put({url: url, jwt: jwt, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
 		if(err) {
 			callback(err, {status: 'error'});
 		} else if(body.indexOf(item.translation) > -1) {
@@ -50,12 +55,12 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, ca
 		} else {
 			callback('Smth wrong during google API request.', {status: 'error'});
 		}
-	}).auth(null, null, true, token);
+	});
 };
 
 // adds new localisation key to each lang (worksheet) in spreadsheet
-GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(token, key, item, callback) {
-	this.getWorksheetsInfo(token, key, function(err, response) {
+GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, callback) {
+	this.getWorksheetsInfo(key, function(err, response) {
 		if(response.status === 'ok') {
 			async.each(response.data, function(worksheet, asyncCompleted) {
 				var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
@@ -67,14 +72,14 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(token, key, ite
 								'<gsx:translation></gsx:translation>' +
 							'</entry>';
 				var url = worksheet.link;
-				request.post({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
+				request.post({url: url, jwt: jwt, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
 					if(err) {
 						console.log(err);
 					} else{
 						console.log('posted!');
 					}
 					asyncCompleted();
-				}).auth(null, null, true, token);	
+				});	
 			}, function(err) {
 				if(err) {
 					console.log(err);
@@ -92,14 +97,14 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(token, key, ite
 };
 
 // returns cell-based spreadsheets data divided by language using spreadsheet key
-GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(token, key, callback) {
+GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) {
 	var result = {};
-	this.getWorksheetsInfo(token, key, function(err, response) {
+	this.getWorksheetsInfo(key, function(err, response) {
 		if(response.status === 'ok') {
 			async.each(response.data, function(item, asyncCompleted) {
 				var url = item.link + '?alt=json';
 				var lang = item.lang;
-				request.get(url, function(err, response, body) {
+				request.get({url: url, jwt: jwt}, function(err, response, body) {
 					if(!body) {
 						callback("Empty response", {status: 'error', data: []});
 					}
@@ -116,7 +121,7 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(token, key, cal
 						console.log('Error during parsing ' + lang);
 					}
 					asyncCompleted();
-				}).auth(null, null, true, token);				
+				});				
 			}, function(err) {
 				if(err) {
 					console.log(err);
@@ -132,8 +137,8 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(token, key, cal
 }
 
 // Returns cell-based data from worksheet using worksheet url
-GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(token, url, callback) {
-	request.get(url + '?alt=json', function(err, response, body) {
+GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(url, callback) {
+	request.get({url: url + '?alt=json', jwt: jwt}, function(err, response, body) {
 		if(!body) {
 			callback("Empty response", {status: 'error', data: []});
 		}
@@ -152,14 +157,14 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(token, url, callb
 		} else {
 			callback("Can't parse worksheet", {status: 'error', data: []});
 		}
-	}).auth(null, null, true, token);	
+	});	
 };
 
 // Returns worksheets information (name, lang, link) using spreadsheet key
-GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(token, key, callback) {
+GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(key, callback) {
 	var self = this;
 	var url = this.root + '/worksheets/' + key + '/private/full?alt=json';
-	request.get(url, function(err, response, body) {
+	request.get({url: url, jwt: jwt}, function(err, response, body) {
 		if(!body) {
 			callback("Empty response", {status: 'error', data: []});
 		}
@@ -182,7 +187,7 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(token, key, call
 			});
 			callback(null, {status: 'ok', data: result});
 		}
-	}).auth(null, null, true, token);
+	});
 };
 
 module.exports = new GoogleSpreadsheetsHelper();

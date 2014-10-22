@@ -23,12 +23,17 @@ html(lang="en")
 		#left-button-section
 			#create-new-localisation(title="New Key")
 				i.fa.fa-plus
-			#go-to-admin(title="Admin Page")
-				a(href="/admin")
-					i.fa.fa-cogs
+			#create-zip(title="Create zip")
+				a(href="/zip?key=#{key}")
+					i.fa.fa-file-archive-o		
+			#get-diff(title="Get DIFF")
+				i.fa.fa-random
 			#change-spreadsheet(title="Change spreadsheet key")
 				a(href="/") 
-					i.fa.fa-repeat
+					i.fa.fa-repeat			
+			#logout(title="Logout")
+				a(href="/logout") 
+					i.fa.fa-power-off
 		#popup.visible
 			ul.source-list
 				li#login-form

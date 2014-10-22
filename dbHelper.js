@@ -29,6 +29,31 @@ DbHelper.prototype.initialize = function(uri) {
 	});
 };
 
+DbHelper.prototype.createUser = function(user, callback) {
+	this.getUser(user, function(err, user) {
+		if(user) {
+			return callback("The user with such name already exist.");			
+		}
+		this.db.collection('users').insert(user, function(err, docs) {
+			if(!err) {
+				callback();
+			} else {
+				callback(err);
+			}
+		});
+	});
+};
+
+DbHelper.prototype.getUser = function(user, callback) {
+	this.db.collection('users').findOne({name: user.name}, function(err, user) {
+		if(!err && user) {
+			callback(null, user);
+		} else {
+			callback(err);
+		}
+	});
+};
+
 DbHelper.prototype.insertLocalisations = function(records) {
 	var localisation = this.db.collection('localisation');
 	for(var lang in records) {

@@ -1,6 +1,9 @@
 # Localisations
 /localisation/**/*.json
 
+#private keys
+*.pem
+
 # Zip
 *.zip
 
