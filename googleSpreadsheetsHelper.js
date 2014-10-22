@@ -3,6 +3,7 @@ var _ = require('underscore');
 var auth = require('./googleAuth');
 var async = require('async');
 var dbHelper = require('./dbHelper');
+var XML = require("node-jsxml").XML;
 
 function GoogleSpreadsheetsHelper() {
 	this.root = 'https://spreadsheets.google.com/feeds';
@@ -43,7 +44,9 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(token, item, ca
 			callback(err, {status: 'error'});
 		} else if(body.indexOf(item.translation) > -1) {
 			dbHelper.logTranslationUpdate(item);
-			callback(null, {status: 'ok'}); // TODO update edit link
+			var newItem = new XML(body);
+			var newEditLink = newItem.child('link').item(1).attribute('href').getValue()
+			callback(null, {status: 'ok', data: {editLink: newEditLink}});
 		} else {
 			callback('Smth wrong during google API request.', {status: 'error'});
 		}

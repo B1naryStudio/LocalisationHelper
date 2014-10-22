@@ -222,6 +222,8 @@ var app = app || {};
 			data: {item: data},
 			success: function(response) {
 				if(response.status === 'ok') {
+					data.editLink = response.data.editLink;
+					$translationItemContainer.data('item', data);
 					$translationItemContainer.toggleClass('changed', false);
 					$textContainer.data('default', $textContainer.text());
 					alertify.success("Changes has been applied");
