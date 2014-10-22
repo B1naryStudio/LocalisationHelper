@@ -64,7 +64,7 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(token, key, ite
 								'<gsx:key>' + item.key + '</gsx:key>' +
 								'<gsx:originalvalue>' + item.originalValue + '</gsx:originalvalue>' +
 								'<gsx:project>' + item.project + '</gsx:project>' +
-								'<gsx:translation>' + item.translation + '</gsx:translation>' +
+								'<gsx:translation></gsx:translation>' +
 							'</entry>';
 				var url = worksheet.link;
 				request.post({url: url, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
