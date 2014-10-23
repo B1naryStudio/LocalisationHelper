@@ -3,13 +3,16 @@ var dbHelper = require('./dbHelper');
 
 function AuthHelper () {
 	this.SALT_WORK_FACTOR = 10;
+	this.register({name: 'admin', password: 'admin', role: 'admin'}, function() {
+		
+	});
 }
 
-AuthHelper.prototype.register = function(user) {
+AuthHelper.prototype.register = function(user, callback) {
 	if(!user.name || !user.password) {
 		return callback("Please check your user");		
 	}
-	bcrypt.genSalt(this.SALT_WORK_FACTOR, function(err, salt, callback) {
+	bcrypt.genSalt(this.SALT_WORK_FACTOR, function(err, salt) {
 		if(err) {
 			callback(err);
 		} else {
@@ -34,7 +37,8 @@ AuthHelper.prototype.register = function(user) {
 
 AuthHelper.prototype.signIn = function(candidateUser, callback) {
 	dbHelper.getUser(candidateUser, function(err, user) {
-		bcrypt.compare(candidateUser.password, user.password, function(err, isMatch) {
+		var hash = bcrypt.hashSync(user.password, user.salt);
+		bcrypt.compare(hash, user.password, function(err, isMatch) {
 			if (err) {
 				return callback(err);
 			}
@@ -42,3 +46,5 @@ AuthHelper.prototype.signIn = function(candidateUser, callback) {
 		});		
 	});
 };
+
+module.exports = new AuthHelper();

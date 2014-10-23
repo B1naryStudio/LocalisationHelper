@@ -10,17 +10,20 @@ var app = app || {};
 			popup           : $('#popup'),
 			history         : $('#history'),
 			spinner         : $('#spinner'),
-			loginForm       : $('#login-form'),
 			container       : $('#container'),
 			worksheets      : $('#worksheets'),
+			loginForm       : $('#login-form'),
 			spreadsheetKey  : $('#sp-key-value'),
-			newLocalisation : $('#localisation-new'),
+			spreadsheetForm : $('#spreadsheet-form'),
+			newLocalisation : $('#localisation-new'),			
+			loginFormName   : $('#login-form-name'),
 			locKey          : $('#localisation-key'),
+			loginFormPass   : $('#login-form-password'),
 			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
 			locOriginal     : $('#localisation-original'),
-			locTranslation  : $('#localisation-translation'),
+			locTranslation  : $('#localisation-translation')
 		};
 		this.$templates = {
 			worksheetsTemplate      : $('#worksheet-template'),
@@ -169,6 +172,19 @@ var app = app || {};
 		});
 	};
 
+	PageController.prototype.loginFormSubmit = function() {
+		var name = this.$el.loginFormName.val();
+		var pass = this.$el.loginFormPass.val();
+		$.post('/login', {name: name: pass: pass}, function(response) {
+			if(response.status === 'ok') {
+				var role = response.role;
+			} else {
+				alertify.error(response.error);
+				console.log(response.error);
+			}
+		});
+	};
+
 	PageController.prototype.closeHistoryPopup = function() {
 		clearFade();
 		var $oldTranslationContainer = $('.translation-item.selected');
@@ -290,6 +306,7 @@ var app = app || {};
 
 	PageController.prototype.bindListeners = function() {
 		$('#sp-key-ok').click(this.loadSpreadsheet);
+		$('#login-form-ok').click(this.loginFormSubmit);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
 		$('#create-zip').click(this.getLocalisationZip);
 		$('#localisation-new-cancel').click(this.closeNewKeyPopup);

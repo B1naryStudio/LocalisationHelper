@@ -21,7 +21,7 @@ dbHelper.initialize(app.get('db-uri'));
 
 function checkAuth(req, res, next) {
 	next();
-} 
+}
 
 app.get('/', checkAuth, function(req, res) {
 	res.render('index.jade');
@@ -42,12 +42,28 @@ app.get('/', checkAuth, function(req, res) {
 // 	}
 // });
 
-app.get('/login', function(req, res) {
-	var name = req.body.name;
-	var password = req.body.password;
-	auth.signIn({name: name, password: password}, function(err, isMatch) {
+app.post('/register', function(req, res) {
+	var user = {
+		name : req.body.name,
+		pass : req.body.pass
+	};
+	auth.register(user, function(err) {
+		if(!err) {
+			res.redirect('/login');
+		} else {
+			res.redirect('/login');
+		}
+	});
+});
+
+app.post('/login', function(req, res) {
+	var user = {
+		name : req.body.name,
+		pass : req.body.pass
+	};
+	auth.signIn(user, function(err, isMatch) {
 		if(isMatch) {
-			req.session.auth = 
+			req.session.auth = user;  
 		}
 	});
 });
