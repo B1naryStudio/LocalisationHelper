@@ -7,25 +7,31 @@ var app = app || {};
 	function PageController() {
 		self = this;
 		this.$el = {
+			diff            : $('#diff'),
 			data            : $('#data'),
 			popup           : $('#popup'),
 			history         : $('#history'),
+			dateTo          : $('#date-to'),
 			spinner         : $('#spinner'),
+			dateFrom        : $('#date-from'),
 			container       : $('#container'),
 			worksheets      : $('#worksheets'),
+			diffContent     : $('#diff-content'),
 			spreadsheetKey  : $('#sp-key-value'),
 			newLocalisation : $('#localisation-new'),
+			spreadsheetForm : $('#spreadsheet-form'),
 			locKey          : $('#localisation-key'),
 			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
 			locOriginal     : $('#localisation-original'),
-			locTranslation  : $('#localisation-translation'),
+			locTranslation  : $('#localisation-translation')
 		};
 		this.$templates = {
 			worksheetsTemplate      : $('#worksheet-template'),
 			translationItemTemplate : $('#translation-item-template'),
-			historyTemplate         : $('#history-translation-template')
+			historyTemplate         : $('#history-translation-template'),
+			diffTemplate            : $('#diff-template')
 		};
 		
 		this.showModifiedOnly = false;
@@ -66,6 +72,10 @@ var app = app || {};
 	function clearFade() {
 		self.$el.popup.find('.visible').toggleClass('visible', false);
 		self.$el.popup.toggleClass('visible', false);
+	}
+
+	function updateCurrentWorksheet() {
+		$('.worksheet.selected').click();
 	}
 
 	PageController.prototype.showOnlyModified = function() {
@@ -258,10 +268,6 @@ var app = app || {};
 		fadeScreen('newLocalisation');
 	};
 
-	PageController.prototype.closeNewKeyPopup = function() {
-		clearFade();
-	};
-
 	PageController.prototype.addNewKey = function() {
 		var item = {		
 			key : self.$el.locKey.val(),
@@ -270,25 +276,80 @@ var app = app || {};
 			translation : self.$el.locTranslation.val(),
 			originalValue: self.$el.locOriginal.val()
 		};
-		var key = self.$el.spreadsheetKey.val();
 		fadeScreen('spinner');
-		$.post('/localisation', {item: item, key: key}, function(response) {
+		$.post('/localisation', {item: item}, function(response) {
 			if(response.status === 'ok') {
 				alertify.success("Key has been successfully added");
-				console.log(JSON.stringify(response));
+				console.log(JSON.stringify(response));				
 			} else {
 				alertify.error(response.error);
 				console.log(response.error);
 			}
 			clearFade();
+			updateCurrentWorksheet();
 		});
 	};
 
+	PageController.prototype.deleteTranslationKey = function() {
+		var container = $(this).closest('.translation-item');
+		var item = container.data('item');
+		fadeScreen('spinner');
+		if(item) {
+			$.ajax({
+				url: '/localisation',
+				type: 'DELETE',
+				data: {item: item},
+				success: function(response) {
+					if(response.status === 'ok') {
+						updateCurrentWorksheet();
+						alertify.success("Key has been successfully removed");
+					} else {
+						alertify.error(response.error);
+						console.log(response.error);
+						clearFade();
+					}					
+				},
+				error: function(err) {
+					alertify.error(err);
+					console.log(err);
+					clearFade();
+				}
+			});
+		}
+	};
+
+	PageController.prototype.getLocalisationDiff = function() {
+		var from = self.$el.dateFrom.val();
+		var to = self.$el.dateTo.val();
+		$.getJSON('/diff', {from: from, to: to}, function(response) {
+			if(response.status === 'ok') {
+				var data = response.data;
+				var update = _.groupBy(_.where(data, {type: 'update'}), function(item) {
+					return item.lang;
+				});
+				var add = _.groupBy(_.where(data, {type: 'add'}), function(item) {
+					return item.project;
+				});
+				var remove = _.groupBy(_.where(data, {type: 'delete'}), function(item) {
+					return item.project;
+				});
+				data = {
+					update: update,
+					add: add,
+					remove: remove
+				};
+
+				var template = self.$templates.diffTemplate;
+				self.$el.diffContent.html(template.tmpl(data));
+			} else {
+				self.$el.diffContent.html(response.error);
+			}
+		});		
+	};
+
 	PageController.prototype.bindListeners = function() {
-		$('#sp-key-ok').click(this.loadSpreadsheet);
+		$('#request-diff').click(this.getLocalisationDiff);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
-		$('#create-zip').click(this.getLocalisationZip);
-		$('#localisation-new-cancel').click(this.closeNewKeyPopup);
 		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);
 		$('#localisation-missed-only').click(this.showOnlyMissed);
@@ -298,12 +359,31 @@ var app = app || {};
 		$('#language-search').on('keyup', _.debounce(this.searchByLanguages, 200));
 		$('#localisation-search').on('keyup', _.debounce(this.searchByTranslations, 200));
 		$('#data').on('click', '.translation-history', this.getTranslationHistory);
+		$('#data').on('click', '.translation-delete', this.deleteTranslationKey);
 		$('#data').on('click', '.translation-apply', this.applyTranslationChanges);
 		$('#data').on('click', '.translation-cancel', this.cancelTranslationChanges);
 		$('#data').on('keyup', '.translation-value-text', this.onTranslationTextChanged);
 		$('#data').on('click', '.translation-item', function() {
 			$(this).find('.translation-value > span').focus();
-		});	
+		});
+		$('#change-spreadsheet').click(function() {
+			fadeScreen('spreadsheetForm');
+		});
+		$('#get-diff').click(function() {
+			fadeScreen('diff');
+		});
+		$('#diff-close, #form-close, #localisation-new-cancel').click(function() {
+			clearFade();
+		});
+		$('#date-from, #date-to').pikaday({
+			firstDay: 1,
+			minDate: new Date('2000-01-01'),
+			maxDate: new Date('2020-12-31'),
+			defaultDate: new Date(),
+			setDefaultDate : new Date(),
+			yearRange: [2000,2020],
+			format: 'YYYY-MM-DD',
+		});
 	};
 
 	app.PageController = PageController;

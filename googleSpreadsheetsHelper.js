@@ -96,6 +96,43 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, call
 	});
 };
 
+GoogleSpreadsheetsHelper.prototype.deleteLocalisation = function(spreadsheetKey, item, callback) {
+	var self = this;
+	var translationKey = item.key;
+	this.getWorksheetsInfo(spreadsheetKey, function(err, response) {
+		if(response.status === 'ok') {
+			async.each(response.data, function(worksheet, asyncCompleted) {
+				var url = worksheet.link;
+				self.getWorksheetData(url, function(err, response) {
+					if(response.status === 'ok') {
+						var itemToDelete = _.findWhere(response.data, {key: translationKey});
+						if(itemToDelete) {
+							request.del({url: itemToDelete.editLink, jwt: jwt, headers: {'Content-Type' : 'application/atom+xml'}}, function(err, httpResponse, body) {
+								if(err) {
+									console.log(err);
+								} else{
+									console.log('deleted from ' + itemToDelete.lang + ' lang!');
+								}							
+							});	
+						}
+					}
+					asyncCompleted();
+				});
+			}, function(err) {
+				if(err) {
+					console.log(err);
+					callback(err, {status: 'error'});
+				} else {						
+					dbHelper.logTranslationDelete(item);
+					callback(null, {status: 'ok'});
+				}
+			});
+		} else {
+			callback(err, response);
+		}		
+	});	
+};
+
 // returns cell-based spreadsheets data divided by language using spreadsheet key
 GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) {
 	var result = {};

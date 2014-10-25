@@ -5,6 +5,7 @@ html(lang="en")
 		link(rel="stylesheet", href="css/main.css")
 		link(rel="stylesheet", href="css/alertify.core.css")
 		link(rel="stylesheet", href="css/alertify.default.css")
+		link(rel="stylesheet", href="css/datetime.css")
 		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:700,400', type='text/css')
 	body
@@ -21,15 +22,19 @@ html(lang="en")
 			#worksheets.scrollBarBox
 			#data.scrollBarBox
 		#left-button-section
-			#create-new-localisation(title="New Key")
-				i.fa.fa-plus
-			#create-zip(title="Create zip")
-				a(href="/zip?key=#{key}")
-					i.fa.fa-file-archive-o
-			#get-diff(title="Get DIFF")
-				i.fa.fa-random
-			#change-spreadsheet(title="Change spreadsheet key")
-				a(href="/") 
+			if user.role == 'admin'
+				#users(title="Manage users")
+					a(href="/users")
+						i.fa.fa-users
+			if user.role == 'admin' || user.role == 'developer'	
+				#create-new-localisation(title="New Key")
+					i.fa.fa-plus
+				#create-zip(title="Create zip")
+					a(href="/zip")
+						i.fa.fa-file-archive-o
+				#get-diff(title="Get diff")
+					i.fa.fa-random
+				#change-spreadsheet(title="Change spreadsheet key")
 					i.fa.fa-repeat
 			#logout(title="Logout")
 				a(href="/logout") 
@@ -38,9 +43,10 @@ html(lang="en")
 			ul.source-list
 				li#spreadsheet-form
 					div
-						#sp-key
-							input#sp-key-value(type='text', placeholder='Enter spreadsheet key', value='#{key}')
-							button#sp-key-ok Ok
+						form(action="/newkey", method="POST")
+							input#sp-key-value(type='text', placeholder='Enter spreadsheet key', value='#{key}', name="key")
+							input(type="submit", value="OK")
+						button#form-close Close
 				li#spinner
 					div
 						.loader
@@ -58,6 +64,14 @@ html(lang="en")
 						div#buttons-section
 							button#localisation-new-cancel Close
 							button#localisation-new-ok Create
+				li#diff
+					div
+						div#diff-filters
+							input#date-from
+							input#date-to
+							button#request-diff Get
+							button#diff-close Close
+						#diff-content
 
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
@@ -66,6 +80,8 @@ html(lang="en")
 		script(type="text/javascript", src="lib/alertify.js")
 		script(type="text/javascript", src="js/pageController.js")
 		script(type="text/javascript", src="js/main.js")
+		script(type="text/javascript", src="lib/datetime.js")
+		script(type="text/javascript", src="lib/jdatetime.js")
 		include templates/history-translation-template
 		include templates/translation-item-template
 		include templates/worksheet-template

@@ -91,8 +91,18 @@ app.put('/localisation', function(req, res) {
 
 app.post('/localisation', function(req, res) {
 	var item = req.body.item;
-	var key = req.body.key;
-	spreadsheetsHelper.addNewLocalisation(key, item, function(err, result) {
+	spreadsheetsHelper.addNewLocalisation(spreadsheetKey, item, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err});
+		} else {
+			res.json(result);
+		}
+	});
+});
+
+app.delete('/localisation', function(req, res) {
+	var item = req.body.item;
+	spreadsheetsHelper.deleteLocalisation(spreadsheetKey, item, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err});
 		} else {
@@ -102,8 +112,7 @@ app.post('/localisation', function(req, res) {
 });
 
 app.get('/zip', checkAuth, function(req, res) {
-	var key = req.query.key;
-	spreadsheetsHelper.getSpreadsheetData(key, function(err, result) {
+	spreadsheetsHelper.getSpreadsheetData(spreadsheetKey, function(err, result) {
 		if(result.status === 'error') {
 			res.json('error');
 		} else {		

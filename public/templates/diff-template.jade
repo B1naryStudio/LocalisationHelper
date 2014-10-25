@@ -15,13 +15,25 @@ script#diff-template(type="text/x-jQuery-tmpl")
 			|{{/each}}
 		.diff-add-section
 			|{{each add}}
-			.diff-item-update-project ${$index}
+			.diff-item-add-project ${$index}
 			|{{each $value}}
 			.diff-item-add
 				| +
 				span.diff-item-add-project ${$value.project} 
 				span.diff-item-add-key ${$value.key} 
 				span.diff-item-add-original-value ${$value.originalValue} 
-				span.diff-item-update-date ${$value.createdAt} 
+				span.diff-item-add-date ${$value.createdAt} 
+			|{{/each}}
+			|{{/each}}		
+		.diff-delete-section
+			|{{each remove}}
+			.diff-item-delete-project ${$index}
+			|{{each $value}}
+			.diff-item-delete
+				| -
+				span.diff-item-delete-project ${$value.project} 
+				span.diff-item-delete-key ${$value.key} 
+				span.diff-item-delete-original-value ${$value.originalValue} 
+				span.diff-item-delete-date ${$value.createdAt} 
 			|{{/each}}
 			|{{/each}}

@@ -84,31 +84,28 @@ DbHelper.prototype.insertLocalisation = function(item) {
 };
 
 DbHelper.prototype.logTranslationUpdate = function(localisation) {
-	this.insertLocalisation(localisation);
-	localisation.dateTime = new Date();
-	localisation.type = "update";
-	this.db.collection('diff').
-		insert(localisation, function(err, docs) {
-			if(!err) {
-				console.log('Logged localisation "Update". Key: ' + 
-					localisation.key + ', lang: ' + localisation.lang);
-			} else {
-				console.log('Can\'t log localisation "Update". Reason: ' + err);
-			}
-		});
+	this.logTranslation(localisation, 'update');
+};
+
+DbHelper.prototype.logTranslationDelete = function(localisation) {
+	this.logTranslation(localisation, 'delete');
 };
 
 DbHelper.prototype.logTranslationAdd = function(localisation) {
+	this.logTranslation(localisation, 'add');
+};
+
+DbHelper.prototype.logTranslation = function(localisation, type) {
 	this.insertLocalisation(localisation);
 	localisation.dateTime = new Date();
-	localisation.type = "add";
+	localisation.type = type;
 	this.db.collection('diff').
 		insert(localisation, function(err, docs) {
 			if(!err) {
-				console.log('Logged localisation "Add". Key: ' + 
+				console.log('Logged localisation "' + type.toUpperCase() + '". Key: ' + 
 					localisation.key);
 			} else {
-				console.log('Can\'t log localisation "Add". Reason: ' + err);
+				console.log('Can\'t log localisation "' + type.toUpperCase() + '". Reason: ' + err);
 			}
 		});
 };

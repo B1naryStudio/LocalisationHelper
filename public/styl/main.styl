@@ -62,7 +62,8 @@ Scrollbars
 	background-color: gray;
 }
 
-#login-form, #localisation-new
+#login-form, #localisation-new, 
+#diff, #spreadsheet-form
 	& > div
 		background white
 		width 400px
@@ -75,10 +76,31 @@ Scrollbars
 		bottom 0
 		box-shadow 0px 0px 15px 0px #000
 
+#diff
+	& > div
+		height: 400px
+		width: 600px
+		padding: 5px
+		input
+			width: 30%
+			float: left
+			margin: 5px
+		button
+			width: 50px
+			float: left
+			margin: 5px
+			padding: 7px
+	#diff-filters
+		overflow: hidden
+		height: 44px
+	#diff-content
+		overflow: hidden
+		height: calc(100% - 44px)
+
 #localisation-new
 	& > div
-		height 340px
-		width 500px
+		height 292px
+		width 415px
 
 #localisation-new
 	& > div
@@ -260,7 +282,7 @@ input
 		background-color: #F4F4F4
 		.translation-history, .translation-delete
 			opacity: 1
-			
+
 .fa-key, .fa-refresh, .fa-home, .fa-comments
 	padding-right: .5rem
 	font-size: .9rem
