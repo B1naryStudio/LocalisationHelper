@@ -8,6 +8,7 @@ var fileSystemHelper = require('./fileSystemHelper');
 var dbHelper = require('./dbHelper');
 var auth = require('./authHelper');
 var staticDir = __dirname + '/public';
+var spreadsheetKey = '1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));
@@ -20,27 +21,17 @@ app.set('view engine', 'jade');
 dbHelper.initialize(app.get('db-uri'));
 
 function checkAuth(req, res, next) {
-	next();
+	if(!req.session.auth) {
+		res.render('login.jade');
+	} else {
+		next();
+	}
 }
 
 app.get('/', checkAuth, function(req, res) {
-	res.render('index.jade');
+	var user = req.session.auth;
+	res.render('index.jade', {user: user, key: spreadsheetKey});
 });
-
-// app.get('/admin', checkAuth, function(req, res) {
-// 	var user = basicAuth(req);
-// 	if(user && user.name === 'test' && user.pass === 'test') {
-// 		var key = req.session.key;
-// 		if(key) {
-// 			res.render('admin.jade');
-// 		} else {
-// 			res.redirect('/');
-// 		}
-// 	} else {
-// 		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-// 		return res.send(401).end();
-// 	}
-// });
 
 app.post('/register', function(req, res) {
 	var user = {
@@ -49,9 +40,9 @@ app.post('/register', function(req, res) {
 	};
 	auth.register(user, function(err) {
 		if(!err) {
-			res.redirect('/login');
+			res.render('login.jade');
 		} else {
-			res.redirect('/login');
+			res.render('login.jade', {error: err});
 		}
 	});
 });
@@ -61,16 +52,19 @@ app.post('/login', function(req, res) {
 		name : req.body.name,
 		pass : req.body.pass
 	};
-	auth.signIn(user, function(err, isMatch) {
-		if(isMatch) {
-			req.session.auth = user;  
+	auth.signIn(user, function(err, result) {
+		if(err) {
+			res.render('login.jade', {error: err});			  
+		} else {
+			req.session.auth = result.data.user;
+			res.redirect('/');
 		}
 	});
 });
 
 app.get('/logout', function(req, res) {
 	req.session.auth = null;
-	res.redirect('/login');
+	res.redirect('/');
 });
 
 app.get('/localisation', function(req, res) {
@@ -148,6 +142,16 @@ app.get('/diff', function(req, res) {
 			res.json(result);
 		}
 	});
+});
+
+app.post('/newkey', function(req, res) {
+	var key = req.body.key;
+	if(key) {
+		spreadsheetKey = key;
+		res.json({status: 'ok', data: {key: key}});
+	} else {
+		res.json({error: 'New key is not valid'});
+	}
 });
 
 app.get('/latest', function(req, res) {

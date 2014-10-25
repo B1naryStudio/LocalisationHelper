@@ -1,0 +1,59 @@
+doctype html
+html(lang="en")
+	head
+		title Localisation Helper
+		link(rel="stylesheet", href="css/main.css")
+		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
+	body
+		#popup.visible
+			ul.source-list
+				li#login-form.visible
+					div
+						form(action="/login", method="POST")
+							h2 Login
+								input#login-form-name(name="name")
+								input#login-form-password(name="pass", type="password")
+								#error-message #{error}
+								input#login-form-ok(type="submit", value="Login")
+		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
+		script(type="text/javascript").
+			$(document).ready(function() {
+
+			});
+		//- script(type="text/javascript").
+		//- 	$(document).ready(function() {
+		//- 		var content = $('#content');
+		//- 		$('#date-from, #date-to').pikaday({
+		//- 			firstDay: 1,
+		//- 			minDate: new Date('2000-01-01'),
+		//- 			maxDate: new Date('2020-12-31'),
+		//- 			defaultDate: new Date(),
+		//- 			setDefaultDate : new Date(),
+		//- 			yearRange: [2000,2020],
+		//- 			format: 'YYYY-MM-DD',
+		//- 		});
+		//- 		$('#get-diff').click(function() {
+		//- 			var from = $('#date-from').val();
+		//- 			var to = $('#date-to').val();
+		//- 			$.getJSON('/diff', {from: from, to: to}, function(response) {
+		//- 				if(response.status === 'ok') {
+		//- 					var data = response.data;
+		//- 					var update = _.groupBy(_.where(data, {type: 'update'}), function(item) {
+		//- 						return item.lang;
+		//- 					});
+		//- 					var add = _.groupBy(_.where(data, {type: 'add'}), function(item) {
+		//- 						return item.project;
+		//- 					});
+		//- 					data = {
+		//- 						update: update,
+		//- 						add: add
+		//- 					};
+
+		//- 					var template = $('#diff-template');
+		//- 					content.html(template.tmpl(data));
+		//- 				} else {
+		//- 					content.html(response.error);
+		//- 				}
+		//- 			});
+		//- 		});
+		//- 	});

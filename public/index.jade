@@ -8,7 +8,7 @@ html(lang="en")
 		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:700,400', type='text/css')
 	body
-		#container
+		#container.visible
 			#data-controls-panel
 				#language-controls
 					input#language-search(type='text', placeholder="Search by language")
@@ -25,28 +25,22 @@ html(lang="en")
 				i.fa.fa-plus
 			#create-zip(title="Create zip")
 				a(href="/zip?key=#{key}")
-					i.fa.fa-file-archive-o		
+					i.fa.fa-file-archive-o
 			#get-diff(title="Get DIFF")
 				i.fa.fa-random
 			#change-spreadsheet(title="Change spreadsheet key")
 				a(href="/") 
-					i.fa.fa-repeat			
+					i.fa.fa-repeat
 			#logout(title="Logout")
 				a(href="/logout") 
 					i.fa.fa-power-off
-		#popup.visible
+		#popup
 			ul.source-list
 				li#spreadsheet-form
 					div
 						#sp-key
-							input#sp-key-value(type='text', placeholder='Enter spreadsheet key', value='1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s')
+							input#sp-key-value(type='text', placeholder='Enter spreadsheet key', value='#{key}')
 							button#sp-key-ok Ok
-				li#login-form
-					div
-						h2 Login
-							input#login-form-name
-							input#login-form-password
-							button#login-form-ok Login
 				li#spinner
 					div
 						.loader
@@ -75,3 +69,4 @@ html(lang="en")
 		include templates/history-translation-template
 		include templates/translation-item-template
 		include templates/worksheet-template
+		include templates/diff-template

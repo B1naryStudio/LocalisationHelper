@@ -30,13 +30,14 @@ DbHelper.prototype.initialize = function(uri) {
 };
 
 DbHelper.prototype.createUser = function(user, callback) {
-	this.getUser(user, function(err, user) {
-		if(user) {
+	var self = this;
+	this.getUser(user, function(err, existedUser) {
+		if(existedUser) {
 			return callback("The user with such name already exist.");			
 		}
-		this.db.collection('users').insert(user, function(err, docs) {
+		self.db.collection('users').insert(user, function(err, docs) {
 			if(!err) {
-				callback();
+				callback(null, {status: 'ok'});
 			} else {
 				callback(err);
 			}

@@ -5,6 +5,7 @@ var app = app || {};
 	var self;
 
 	function PageController() {
+		self = this;
 		this.$el = {
 			data            : $('#data'),
 			popup           : $('#popup'),
@@ -12,18 +13,14 @@ var app = app || {};
 			spinner         : $('#spinner'),
 			container       : $('#container'),
 			worksheets      : $('#worksheets'),
-			loginForm       : $('#login-form'),
 			spreadsheetKey  : $('#sp-key-value'),
-			spreadsheetForm : $('#spreadsheet-form'),
-			newLocalisation : $('#localisation-new'),			
-			loginFormName   : $('#login-form-name'),
+			newLocalisation : $('#localisation-new'),
 			locKey          : $('#localisation-key'),
-			loginFormPass   : $('#login-form-password'),
 			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
 			locOriginal     : $('#localisation-original'),
-			locTranslation  : $('#localisation-translation')
+			locTranslation  : $('#localisation-translation'),
 		};
 		this.$templates = {
 			worksheetsTemplate      : $('#worksheet-template'),
@@ -31,14 +28,10 @@ var app = app || {};
 			historyTemplate         : $('#history-translation-template')
 		};
 		
-		setTimeout(function() {
-			fadeScreen('loginForm');
-		}, 400);
-
 		this.showModifiedOnly = false;
 		this.showMissedOnly = false;
 		this.bindListeners();
-		self = this;
+		this.loadSpreadsheet();
 	};
 
 	function getAllTranslationItemsByCurrentFilter() {
@@ -172,19 +165,6 @@ var app = app || {};
 		});
 	};
 
-	PageController.prototype.loginFormSubmit = function() {
-		var name = this.$el.loginFormName.val();
-		var pass = this.$el.loginFormPass.val();
-		$.post('/login', {name: name: pass: pass}, function(response) {
-			if(response.status === 'ok') {
-				var role = response.role;
-			} else {
-				alertify.error(response.error);
-				console.log(response.error);
-			}
-		});
-	};
-
 	PageController.prototype.closeHistoryPopup = function() {
 		clearFade();
 		var $oldTranslationContainer = $('.translation-item.selected');
@@ -306,7 +286,6 @@ var app = app || {};
 
 	PageController.prototype.bindListeners = function() {
 		$('#sp-key-ok').click(this.loadSpreadsheet);
-		$('#login-form-ok').click(this.loginFormSubmit);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
 		$('#create-zip').click(this.getLocalisationZip);
 		$('#localisation-new-cancel').click(this.closeNewKeyPopup);
