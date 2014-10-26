@@ -371,6 +371,7 @@ var app = app || {};
 		});
 		$('#get-diff').click(function() {
 			fadeScreen('diff');
+			self.$el.diffContent.html('');
 		});
 		$('#diff-close, #form-close, #localisation-new-cancel').click(function() {
 			clearFade();

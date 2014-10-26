@@ -6,6 +6,7 @@ html(lang="en")
 		link(rel="stylesheet", href="css/alertify.core.css")
 		link(rel="stylesheet", href="css/alertify.default.css")
 		link(rel="stylesheet", href="css/datetime.css")
+		link(rel="stylesheet", href="css/hint.min.css")
 		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:700,400', type='text/css')
 	body
@@ -23,20 +24,21 @@ html(lang="en")
 			#data.scrollBarBox
 		#left-button-section
 			if user.role == 'admin'
-				#users(title="Manage users")
+				#users(class="hint--right" data-hint="Manage users")
 					a(href="/users")
 						i.fa.fa-users
 			if user.role == 'admin' || user.role == 'developer'	
-				#create-new-localisation(title="New Key")
+				#create-new-localisation(class="hint--right" data-hint="New Key")
 					i.fa.fa-plus
-				#create-zip(title="Create zip")
+				#create-zip(class="hint--right" data-hint="Create zip")
 					a(href="/zip")
 						i.fa.fa-file-archive-o
-				#get-diff(title="Get diff")
+				#get-diff(class="hint--right" data-hint="Get diff")
 					i.fa.fa-random
-				#change-spreadsheet(title="Change spreadsheet key")
+			if user.role == 'admin'
+				#change-spreadsheet(class="hint--right" data-hint="Change spreadsheet key")
 					i.fa.fa-repeat
-			#logout(title="Logout")
+			#logout(class="hint--right" data-hint="Logout")
 				a(href="/logout") 
 					i.fa.fa-power-off
 		#popup
