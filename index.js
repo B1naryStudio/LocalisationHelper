@@ -91,6 +91,9 @@ app.put('/localisation', function(req, res) {
 
 app.post('/localisation', function(req, res) {
 	var item = req.body.item;
+	if(!item.key || !item.project || !item.originalValue) {
+		return res.json({error: 'Check the translation\'s "original", "key" or "project" value.'});
+	}
 	spreadsheetsHelper.addNewLocalisation(spreadsheetKey, item, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err});
@@ -157,7 +160,7 @@ app.post('/newkey', function(req, res) {
 	var key = req.body.key;
 	if(key) {
 		spreadsheetKey = key;
-		res.json({status: 'ok', data: {key: key}});
+		res.redirect('/');
 	} else {
 		res.json({error: 'New key is not valid'});
 	}

@@ -76,6 +76,20 @@ Scrollbars
 		bottom 0
 		box-shadow 0px 0px 15px 0px #000
 
+#spreadsheet-form
+	form
+		padding: 23px
+		padding-top: 60px
+	input[type=submit]
+		width: 60px
+		height: 30px
+		margin: 20px
+		float: right
+		cursor: pointer
+		background: rgba(0,0,0,0.1)
+		&:hover
+			background: rgba(0,0,0,0.2)
+
 #login-form
 	& > div
 		padding: 22px
@@ -89,7 +103,7 @@ Scrollbars
 			&:hover
 				background: rgba(0,0,0,0.2)
 		input
-			margin: 5px 0px		
+			margin: 5px 0px
 
 #diff
 	& > div
@@ -304,7 +318,7 @@ input
 	color: #aaa
 
 .translation-delete, .translation-history, 
-.translation-key, .translation-context
+.translation-key, .translation-context, .translation-project
 	position: relative
 	float: right
 	font-size: .6rem
@@ -316,7 +330,7 @@ input
 	&:hover
 		color: #555
 
-.translation-key, .translation-context
+.translation-key, .translation-context, .translation-project
 	float: left
 	opacity: 1
 	cursor: initial
@@ -419,19 +433,25 @@ input
 		#history-body
 			height 80%
 			padding 0px 15px
-	#close-button-container
-		height 10%
-		position relative
-		border-radius 0px 0px 4px 4px
-		#close-button
-			position absolute
-			right 0
-			bottom 0
-			height 50px
-			width 15%
-			margin: 2% 2%
-			float right
-			cursor pointer
+
+#existed-list
+	li
+		text-align: left
+
+.close-button
+	position: absolute
+	top: 0
+	right: 0
+	height: 30px
+	width: 30px
+	margin: 2% 2%
+	cursor: pointer
+	font-size: 20px
+	text-align: center
+	line-height: 30px
+	&:hover
+		i
+			font-size: 24px
 
 #spinner
 	& > div

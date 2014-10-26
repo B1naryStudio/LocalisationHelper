@@ -24,20 +24,21 @@ var app = app || {};
 			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
-			locOriginal     : $('#localisation-original'),
-			locTranslation  : $('#localisation-translation')
+			locOriginal     : $('#localisation-original')
 		};
 		this.$templates = {
+			diffTemplate            : $('#diff-template'),
 			worksheetsTemplate      : $('#worksheet-template'),
 			translationItemTemplate : $('#translation-item-template'),
 			historyTemplate         : $('#history-translation-template'),
-			diffTemplate            : $('#diff-template')
+			existedLocsTemplate     : $('#existed-localisations-template')
 		};
 		
 		this.showModifiedOnly = false;
 		this.showMissedOnly = false;
 		this.bindListeners();
 		this.loadSpreadsheet();
+		this.currentData = [];
 	};
 
 	function getAllTranslationItemsByCurrentFilter() {
@@ -133,8 +134,8 @@ var app = app || {};
 			if(response.status === 'ok') {
 				clearFade();
 				alertify.success("Loaded " + item.html());
-				var list = response.data;
-				list.forEach(function(item) {
+				self.currentData = response.data;
+				self.currentData.forEach(function(item) {
 					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
 					if(!item.translation) {
 						$translationItem.toggleClass('missed', true);
@@ -265,7 +266,15 @@ var app = app || {};
 	};
 
 	PageController.prototype.openCreateNewKeyDialog = function() {
-		fadeScreen('newLocalisation');
+		self.$el.locKey.val('');
+		self.$el.locProject.val('CSB');
+		self.$el.locContext.val('');
+		self.$el.locOriginal.val('');
+		if(!self.currentData.length) {
+			alertify.log("Please load any language before add new key");
+		} else {
+			fadeScreen('newLocalisation');
+		}
 	};
 
 	PageController.prototype.addNewKey = function() {
@@ -273,49 +282,80 @@ var app = app || {};
 			key : self.$el.locKey.val(),
 			project : self.$el.locProject.val(),
 			context : self.$el.locContext.val(),
-			translation : self.$el.locTranslation.val(),
 			originalValue: self.$el.locOriginal.val()
 		};
-		fadeScreen('spinner');
-		$.post('/localisation', {item: item}, function(response) {
-			if(response.status === 'ok') {
-				alertify.success("Key has been successfully added");
-				console.log(JSON.stringify(response));				
-			} else {
-				alertify.error(response.error);
-				console.log(response.error);
-			}
-			clearFade();
-			updateCurrentWorksheet();
+		var existedKeys = _.filter(self.currentData, function(it) {
+			return it.project === item.project && 
+				(it.key === item.key || it.originalValue === item.originalValue);
 		});
+		function sendNewKey() {
+			fadeScreen('spinner');
+			$.post('/localisation', {item: item}, function(response) {
+				if(response.status === 'ok') {
+					alertify.success("Key has been successfully added");
+					console.log(JSON.stringify(response));				
+				} else {
+					alertify.error(response.error);
+					console.log(response.error);
+				}
+				clearFade();
+				updateCurrentWorksheet();
+			});
+		}
+		if(existedKeys.length) {
+			var data = {
+				message: 'Seems the key you are trying to add already exist. Do you want to proceed?',
+				existedLocs: existedKeys.map(function(it) {
+					return [it.key, it.originalValue, it.translation].join(' ');
+				})
+			};
+			var messageTmpl = self.$templates.existedLocsTemplate.tmpl(data);
+			alertify.confirm(messageTmpl.html(), function (e) {
+				if(e) {
+					sendNewKey();
+				} else {
+					clearFade();
+				}
+			});
+		} else {
+			sendNewKey();
+		}
 	};
 
 	PageController.prototype.deleteTranslationKey = function() {
 		var container = $(this).closest('.translation-item');
 		var item = container.data('item');
-		fadeScreen('spinner');
-		if(item) {
-			$.ajax({
-				url: '/localisation',
-				type: 'DELETE',
-				data: {item: item},
-				success: function(response) {
-					if(response.status === 'ok') {
-						updateCurrentWorksheet();
-						alertify.success("Key has been successfully removed");
-					} else {
-						alertify.error(response.error);
-						console.log(response.error);
-						clearFade();
-					}					
-				},
-				error: function(err) {
-					alertify.error(err);
-					console.log(err);
-					clearFade();
+		alertify.confirm('Do you really want to delete ' + item.key + ' key?', function (e) {
+			if (e) {
+				// user clicked "ok"
+				fadeScreen('spinner');
+				if(item) {
+					$.ajax({
+						url: '/localisation',
+						type: 'DELETE',
+						data: {item: item},
+						success: function(response) {
+							if(response.status === 'ok') {
+								updateCurrentWorksheet();
+								alertify.success("Key has been successfully removed");
+							} else {
+								alertify.error(response.error);
+								console.log(response.error);
+								clearFade();
+							}					
+						},
+						error: function(err) {
+							alertify.error(err);
+							console.log(err);
+							clearFade();
+						}
+					});
 				}
-			});
-		}
+			} else {
+				// user clicked "cancel"
+				clearFade();
+			}
+		});
 	};
 
 	PageController.prototype.getLocalisationDiff = function() {
@@ -373,7 +413,7 @@ var app = app || {};
 			fadeScreen('diff');
 			self.$el.diffContent.html('');
 		});
-		$('#diff-close, #form-close, #localisation-new-cancel').click(function() {
+		$('.close-button').click(function() {
 			clearFade();
 		});
 		$('#date-from, #date-to').pikaday({

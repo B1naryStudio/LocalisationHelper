@@ -48,7 +48,8 @@ html(lang="en")
 						form(action="/newkey", method="POST")
 							input#sp-key-value(type='text', placeholder='Enter spreadsheet key', value='#{key}', name="key")
 							input(type="submit", value="OK")
-						button#form-close Close
+						.close-button
+							i.fa.fa-close
 				li#spinner
 					div
 						.loader
@@ -64,26 +65,29 @@ html(lang="en")
 						input#localisation-context(placeholder="Context", value="") 
 						input#localisation-original(placeholder="Original value (English)", value="") 
 						div#buttons-section
-							button#localisation-new-cancel Close
 							button#localisation-new-ok Create
+						.close-button
+							i.fa.fa-close
 				li#diff
 					div
 						div#diff-filters
 							input#date-from
 							input#date-to
 							button#request-diff Get
-							button#diff-close Close
 						#diff-content
+						.close-button
+							i.fa.fa-close
 
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
 		script(type="text/javascript", src="lib/underscore.js")
 		script(type="text/javascript", src="lib/moment.js")
 		script(type="text/javascript", src="lib/alertify.js")
-		script(type="text/javascript", src="js/pageController.js")
-		script(type="text/javascript", src="js/main.js")
 		script(type="text/javascript", src="lib/datetime.js")
 		script(type="text/javascript", src="lib/jdatetime.js")
+		script(type="text/javascript", src="js/pageController.js")
+		script(type="text/javascript", src="js/main.js")
+		include templates/existed-localisations-template
 		include templates/history-translation-template
 		include templates/translation-item-template
 		include templates/worksheet-template

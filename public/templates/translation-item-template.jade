@@ -14,7 +14,9 @@ script#translation-item-template(type="text/x-jQuery-tmpl")
 		.translation-original(title='Original (English) value')
 			i.fa.fa-home
 			|${originalValue}
-		
+		.translation-project(title='Project')
+			i.fa.fa-gears
+			| &nbsp; ${project}
 		.translation-delete
 			|delete
 		.translation-history

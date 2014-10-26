@@ -1,0 +1,7 @@
+script#existed-localisations-template(type="text/x-jQuery-tmpl")
+	div
+		#existed-message ${message}
+		ul#existed-list
+			|{{each existedLocs}}
+			li ${$value}
+			|{{/each}}
