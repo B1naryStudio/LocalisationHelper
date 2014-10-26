@@ -28,21 +28,60 @@ function checkAuth(req, res, next) {
 	}
 }
 
+function isAdmin(req, res, next) {
+	if(!req.session.auth || req.session.auth.role !== 'admin') {
+		req.session.auth = null;
+		res.render('login.jade', {error: 'You are not allowed to view this page. Login using another credentials.'});
+	} else {
+		next();
+	}
+}
+
 app.get('/', checkAuth, function(req, res) {
 	var user = req.session.auth;
 	res.render('index.jade', {user: user, key: spreadsheetKey});
 });
 
-app.post('/register', function(req, res) {
+app.get('/accounts', isAdmin, function(req, res) {
+	res.render('users.jade');
+});
+
+app.get('/user', function(req, res) {
+	auth.getUsers(function(err, result) {
+		if(!err) {
+			res.json(result);
+		} else {
+			res.json({error: err});
+		}
+	});
+});
+
+app.post('/user', function(req, res) {
 	var user = {
 		name : req.body.name,
-		pass : req.body.pass
+		pass : req.body.pass,
+		role : req.body.role
 	};
 	auth.register(user, function(err) {
 		if(!err) {
-			res.render('login.jade');
+			res.json({status: 'ok'});
 		} else {
-			res.render('login.jade', {error: err});
+			res.json({error: err});
+		}
+	});
+});
+
+app.put('/user', function(req, res) {
+	var user = {
+		name : req.body.name,
+		pass : req.body.pass,
+		role : req.body.role
+	};
+	auth.updateUser(user, function(err) {
+		if(!err) {
+			res.json({status: 'ok'});
+		} else {
+			res.json({error: err});
 		}
 	});
 });

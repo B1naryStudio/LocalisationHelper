@@ -55,6 +55,27 @@ DbHelper.prototype.getUser = function(user, callback) {
 	});
 };
 
+DbHelper.prototype.getAllUsers = function(callback) {
+	this.db.collection('users')
+		.find({})
+		.toArray(function(err, users) {
+			if(err) {
+				return callback(err, {status: 'error'});
+			}
+			callback(null, users);
+		});
+};
+
+DbHelper.prototype.updateUser = function(user, callback) {
+	this.db.collection('users').update({name: user.name}, user, function(err, user) {
+		if(!err && user) {
+			callback(null, user);
+		} else {
+			callback(err);
+		}
+	});
+};
+
 DbHelper.prototype.insertLocalisations = function(records) {
 	var localisation = this.db.collection('localisation');
 	for(var lang in records) {

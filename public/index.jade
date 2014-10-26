@@ -25,7 +25,7 @@ html(lang="en")
 		#left-button-section
 			if user.role == 'admin'
 				#users(class="hint--right" data-hint="Manage users")
-					a(href="/users")
+					a(href="/accounts")
 						i.fa.fa-users
 			if user.role == 'admin' || user.role == 'developer'	
 				#create-new-localisation(class="hint--right" data-hint="New Key")

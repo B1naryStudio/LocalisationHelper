@@ -1,0 +1,42 @@
+doctype html
+html(lang="en")
+	head
+		title Localisation Helper
+		link(rel="stylesheet", href="css/users.css")
+		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
+	body
+		#container
+			#header
+				input#new-user-name
+				input#new-user-pass
+				select#new-user-role
+					option(value="admin") admin 
+					option(value="developer") developer
+					option(value="translator") translator
+				#add-new-user Create
+			#users
+
+		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
+		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
+		script(type="text/javascript").
+			$(document).ready(function() {
+				var $userTemplate = $('#user-template');
+				var $el = {
+					users      : $('#users'),
+					userName   : $('#new-user-name'),
+					userPass   : $('#new-user-pass'),
+					userRole   : $('#new-user-role'),
+					addNewUser : $('#add-new-user')
+				};
+
+				$.getJSON('/user', function(response) {
+					if(response.status === 'ok') {
+						var users = response.data.users;
+						users.forEach(function(user) {
+							var userItem = $userTemplate.tmpl(user);
+							$el.users.append(userItem);
+						});
+					}
+				});
+			});
+		include templates/user-template
