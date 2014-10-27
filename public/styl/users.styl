@@ -1,0 +1,120 @@
+#container
+	width: 60%
+	margin: auto
+
+#header
+	overflow: hidden
+	input, select
+		width: 20%
+		margin: 5px
+		float: left
+	select
+		padding: 7px
+	#add-new-user
+		float: left
+		height: 33px
+		text-align: center
+		line-height: 33px
+		margin: 5px
+		width: 60px
+		background: rgba(0,0,0,0.2)
+		cursor: pointer
+		&:hover
+			background: rgba(0,0,0,0.4)
+#users
+	.user
+		overflow: hidden
+		.user-info, .user-info-edit
+			width: 70%
+			float: left
+			.user-name, .user-role,
+			.user-name-edit, .user-role-edit
+				width: 40%
+				float: left
+				height: 25px
+		.user-info-edit
+			display: none
+		.update-section
+			width: 30%
+			float: left
+			.update-button
+				background: rgba(92,184,17,.6)
+				width: 70px
+				height: 25px
+				text-align: center
+				line-height: 25px
+				cursor: pointer
+				&:hover
+					background: rgba(92,184,17,.8)
+		.apply-changes-section
+			width: 30%
+			display: none
+			float: left
+
+
+/*------------------------------------------------------------------
+Scrollbars
+------------------------------------------------------------------*/
+.scrollBarBox{
+	width: 100%;
+	height:100%;
+	position:relative;
+	display:inline-block;
+	border-top:1px solid #ebebeb; /*FOR IE*/
+	border-bottom:1px solid #ebebeb; /*FOR IE*/
+	border-top:1px solid rgba(0, 0, 0, 0.1);
+	border-bottom:1px solid rgba(0, 0, 0, 0.1);
+	-webkit-box-sizing:border-box;
+}
+.scrollBarInner{
+	height: 100%;
+	overflow: auto;
+	padding: 5px 15px 15px 15px;
+}
+/*.scrollBarInner::after,*/
+.scrollBarInner .shadow{
+	width:100%;
+	margin-right:0;
+	height:8px;
+	position:absolute;
+	top:0;
+	left:0;
+	background:-webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,.2)), to(rgba(0,0,0,0)));
+	-webkit-mask-box-image:-webkit-gradient(linear, left top, right top, color-stop(0.0, rgba(0,0,0,0)), color-stop(0.5, rgba(0,0,0,.8)), color-stop(1.0, rgba(0,0,0,0)));
+	opacity:0;
+}
+.scrollBarInner.scrolling .shadow{
+	opacity:1;
+}
+
+::-webkit-scrollbar {
+	width: 5px;
+	overflow:visible;
+}
+
+::-webkit-scrollbar-track {
+	background-color: rgba(0,0,0,0.2);
+}
+
+::-webkit-scrollbar-track-piece {
+	background-color: #eee;
+}
+
+::-webkit-scrollbar-thumb {
+	cursor: pointer;
+	background-color: gray;
+}
+
+input
+	width 90%
+	height 20px
+	padding 6px 5px	
+	font-size 13px
+	border 1px solid #ccc
+	border-radius 4px
+	box-shadow inset 0 1px 1px rgba(0,0,0,.075)
+	transition border-color ease-in-out .15s,box-shadow ease-in-out .15s
+	&:focus
+		border-color #66afe9
+		outline 0
+		box-shadow inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)

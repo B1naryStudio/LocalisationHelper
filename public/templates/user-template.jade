@@ -2,10 +2,15 @@ script#user-template(type="text/x-jQuery-tmpl")
 	.user
 		.user-info
 			.user-name ${name}
-			.user-pass ${pass}
 			.user-role ${role}
+		.user-info-edit
+			input.user-name-edit(value="${name}")
+			select.user-role-edit ${role}
+				option(value="admin") admin 
+				option(value="developer") developer
+				option(value="translator") translator
 		.update-section
-			.update-button
+			.update-button Update
 		.apply-changes-section
 			.apply-button
 			.cancel-button
