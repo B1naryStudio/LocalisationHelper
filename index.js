@@ -8,7 +8,7 @@ var fileSystemHelper = require('./fileSystemHelper');
 var dbHelper = require('./dbHelper');
 var auth = require('./authHelper');
 var staticDir = __dirname + '/public';
-var spreadsheetKey = '1U23Aw8HXe82Kbn3AqLZB0ryUcGtVpIatoZQowzl0aho';
+var spreadsheetKey = '1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));

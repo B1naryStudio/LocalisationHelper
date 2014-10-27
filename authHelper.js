@@ -2,7 +2,7 @@ var pass = require('pwd');
 var dbHelper = require('./dbHelper');
 
 function AuthHelper () {
-	this.register({name: 'admin', pass: 'watchandtrade', role: 'admin'}, function() {
+	this.register({name: 'admin', pass: 'admin', role: 'admin'}, function() {
 		
 	});
 }
