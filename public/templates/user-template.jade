@@ -4,13 +4,16 @@ script#user-template(type="text/x-jQuery-tmpl")
 			.user-name ${name}
 			.user-role ${role}
 		.user-info-edit
-			input.user-name-edit(value="${name}")
+			input.user-name-edit(type='hidden', value='${name}')
+			input.user-pass-edit(placeholder="Enter new password")
 			select.user-role-edit ${role}
-				option(value="admin") admin 
-				option(value="developer") developer
-				option(value="translator") translator
+				option(value='admin') admin 
+				option(value='developer') developer
+				option(value='translator') translator
 		.update-section
 			.update-button Update
 		.apply-changes-section
 			.apply-button
+				i.fa.fa-check
 			.cancel-button
+				i.fa.fa-close

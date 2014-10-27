@@ -8,7 +8,7 @@ var fileSystemHelper = require('./fileSystemHelper');
 var dbHelper = require('./dbHelper');
 var auth = require('./authHelper');
 var staticDir = __dirname + '/public';
-var spreadsheetKey = '1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s';
+var spreadsheetKey = '1U23Aw8HXe82Kbn3AqLZB0ryUcGtVpIatoZQowzl0aho';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));
@@ -22,10 +22,17 @@ dbHelper.initialize(app.get('db-uri'));
 
 function checkAuth(req, res, next) {
 	if(!req.session.auth) {
-		res.render('login.jade');
-	} else {
-		next();
+		return res.render('login.jade');
 	}
+	var user = req.session.auth;
+	auth.checkUser(user, function(err, result) {
+		if(err) {
+			res.render('login.jade');		  
+		} else {
+			req.session.auth = result.data.user;
+			next();
+		}
+	});
 }
 
 function isAdmin(req, res, next) {
@@ -164,6 +171,31 @@ app.get('/zip', checkAuth, function(req, res) {
 			});		
 		}
 	});
+});
+
+app.post('/zip', function(req, res) {
+	var user = {
+		name : req.body.name,
+		pass : req.body.pass
+	};
+	auth.signIn(user, function(err, result) {
+		if(err) {
+			console.log('Error while special zip generation. Seems credentials are not valid.');
+			res.json({error: err});
+		} else {
+			spreadsheetsHelper.getSpreadsheetData(spreadsheetKey, function(err, result) {
+				if(result.status === 'error') {
+					console.log('Error while special zip generation. Error during generation.');
+					res.json({error: result.error});
+				} else {		
+					dbHelper.insertLocalisations(result.data);
+					fileSystemHelper.generateJsonFiles(result.data, function(path) {
+						res.download(path);
+					});
+				}
+			});
+		}
+	});	
 });
 
 app.get('/history', function(req, res) {

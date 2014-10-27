@@ -2,7 +2,7 @@ var pass = require('pwd');
 var dbHelper = require('./dbHelper');
 
 function AuthHelper () {
-	this.register({name: 'admin', pass: 'admin', role: 'admin'}, function() {
+	this.register({name: 'admin', pass: 'watchandtrade', role: 'admin'}, function() {
 		
 	});
 }
@@ -45,26 +45,30 @@ AuthHelper.prototype.updateUser = function(candidateUser, callback) {
 		if(!existedUser || err) {
 			return callback('The user with such name doesn\'t exist');
 		}
-		pass.hash(candidateUser.pass, existedUser.salt, function(err, hash){
-			if(existedUser.pass == hash) {
-				pass.hash(candidateUser.pass, function(err, salt, hash){
-					if(!err) {		
-						existedUser.salt = salt;
-						existedUser.pass = hash;
-						dbHelper.updateUser(existedUser, function(err, user) {
-							if(err) {
-								return callback(err);
-							}
-							callback(null, {status: 'ok', data: {user: user}});
-						});
-					} else {
-						callback(err);
+		pass.hash(candidateUser.pass, function(err, salt, hash){
+			if(!err) {		
+				existedUser.salt = salt;
+				existedUser.pass = hash;
+				existedUser.role = candidateUser.role;
+				dbHelper.updateUser(existedUser, function(err, user) {
+					if(err) {
+						return callback(err);
 					}
+					callback(null, {status: 'ok', data: {user: user}});
 				});
 			} else {
-				callback('Check your password');
+				callback(err);
 			}
 		});
+	});
+};
+
+AuthHelper.prototype.checkUser = function(user, callback) {
+	dbHelper.getUser(user, function(err, user) {
+		if(!user || err) {
+			return callback('Check your credentials')
+		}
+		callback(null, {status: 'ok', data: {user: user}});
 	});
 };
 

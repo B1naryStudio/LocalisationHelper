@@ -11,8 +11,8 @@ html(lang="en")
 					div
 						form(action="/login", method="POST")
 							h2 Login
-								input#login-form-name(name="name")
-								input#login-form-password(name="pass", type="password")
+								input#login-form-name(name="name", value="user")
+								input#login-form-password(name="pass", type="password", value="12345")
 								#error-message #{error}
 								input#login-form-ok(type="submit", value="Login")
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")

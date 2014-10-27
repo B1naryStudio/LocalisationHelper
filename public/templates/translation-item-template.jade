@@ -17,8 +17,9 @@ script#translation-item-template(type="text/x-jQuery-tmpl")
 		.translation-project(title='Project')
 			i.fa.fa-gears
 			| &nbsp; ${project}
-		.translation-delete
-			|delete
+		if user.role == 'admin' || user.role == 'developer'	
+			.translation-delete
+				|delete
 		.translation-history
 			|history
 		.translation-key(title='Localisation Key')

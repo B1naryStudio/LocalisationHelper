@@ -7,13 +7,15 @@ html(lang="en")
 	body
 		#container
 			#header
-				input#new-user-name
-				input#new-user-pass
+				input#new-user-name(placeholder="User name") 
+				input#new-user-pass(placeholder="User password") 
 				select#new-user-role
 					option(value="admin") admin 
 					option(value="developer") developer
 					option(value="translator") translator
 				#add-new-user Create
+				button#back
+					a(href="/") Back
 			#users
 
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
@@ -25,18 +27,78 @@ html(lang="en")
 					users      : $('#users'),
 					userName   : $('#new-user-name'),
 					userPass   : $('#new-user-pass'),
-					userRole   : $('#new-user-role'),
-					addNewUser : $('#add-new-user')
+					userRole   : $('#new-user-role')
 				};
 
-				$.getJSON('/user', function(response) {
-					if(response.status === 'ok') {
-						var users = response.data.users;
-						users.forEach(function(user) {
-							var userItem = $userTemplate.tmpl(user);
-							$el.users.append(userItem);
-						});
-					}
+				function updateUsers() {
+					$el.users.html('');			
+					$.getJSON('/user', function(response) {
+						if(response.status === 'ok') {
+							var users = response.data.users;
+							users.forEach(function(user) {
+								var userItem = $userTemplate.tmpl(user);
+								$el.users.append(userItem);
+							});
+						}
+					});
+				}
+
+				updateUsers();
+
+				$('#users').on('click', '.update-button', function() {
+					var $user = $(this).closest('.user');
+					$user.find('.update-section').hide();
+					$user.find('.apply-changes-section').show();
+					$user.find('.user-info').hide();
+					$user.find('.user-info-edit').show();
+				});
+
+				$('#users').on('click', '.cancel-button', function() {
+					var $user = $(this).closest('.user');
+					$user.find('.update-section').show();
+					$user.find('.apply-changes-section').hide();
+					$user.find('.user-info').show();
+					$user.find('.user-info-edit').hide();
+				});				
+
+				$('#users').on('click', '.apply-button', function() {
+					var $user = $(this).closest('.user');
+					var name = $user.find('.user-name-edit').val();
+					var pass = $user.find('.user-pass-edit').val();
+					var role = $user.find('.user-role-edit').val();
+					$.ajax({
+						url: '/user',
+						method: 'PUT',
+						data: {name: name, pass: pass, role: role},
+						success: function(response) {
+							if(response.status === 'ok') {
+								$user.find('.user-pass-edit').val('');
+								$user.find('.user-role-edit').val('');							
+								updateUsers();
+							} else {
+								alert(response.error);
+							}	
+						},
+						error: function(err) {
+							alert(err);
+						}
+					});
+				});
+
+				$('#add-new-user').click(function() {
+					var name = $el.userName.val();
+					var pass = $el.userPass.val();
+					var role = $el.userRole.val();
+					$.post('/user', {name: name, pass: pass, role: role}, function(response) {
+						if(response.status === 'ok') {
+							$el.userName.val('');
+							$el.userPass.val('');
+							$el.userRole.val('');
+							updateUsers();
+						} else {
+							alert(response.error);
+						}
+					});
 				});
 			});
 		include templates/user-template

@@ -46,14 +46,14 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback)
 	var url = item.editLink;
 	request.put({url: url, jwt: jwt, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
 		if(err) {
-			callback(err, {status: 'error'});
+			return callback(err, {status: 'error'});
 		} else if(body.indexOf(item.translation) > -1) {
 			dbHelper.logTranslationUpdate(item);
 			var newItem = new XML(body);
 			var newEditLink = newItem.child('link').item(1).attribute('href').getValue()
-			callback(null, {status: 'ok', data: {editLink: newEditLink}});
+			return callback(null, {status: 'ok', data: {editLink: newEditLink}});
 		} else {
-			callback('Smth wrong during google API request.', {status: 'error'});
+			return callback('Smth wrong during google API request.', {status: 'error'});
 		}
 	});
 };
@@ -83,14 +83,14 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, call
 			}, function(err) {
 				if(err) {
 					console.log(err);
-					callback(err, {status: 'error'});
+					return callback(err, {status: 'error'});
 				} else {						
 					dbHelper.logTranslationAdd(item);
-					callback(null, {status: 'ok'});
+					return callback(null, {status: 'ok'});
 				}
 			});
 		} else {
-			callback(err, response);
+			return callback(err, response);
 		}
 		
 	});
@@ -122,14 +122,14 @@ GoogleSpreadsheetsHelper.prototype.deleteLocalisation = function(spreadsheetKey,
 			}, function(err) {
 				if(err) {
 					console.log(err);
-					callback(err, {status: 'error'});
+					return callback(err, {status: 'error'});
 				} else {						
 					dbHelper.logTranslationDelete(item);
-					callback(null, {status: 'ok'});
+					return callback(null, {status: 'ok'});
 				}
 			});
 		} else {
-			callback(err, response);
+			return callback(err, response);
 		}		
 	});	
 };
@@ -144,32 +144,30 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) 
 				var lang = item.lang;
 				request.get({url: url, jwt: jwt}, function(err, response, body) {
 					if(!body) {
-						callback("Empty response", {status: 'error', data: []});
+						console.log('Empty response for lang ' + lang);
 					}
 					var parsed;
 					try {
 						parsed = JSON.parse(body);
 					} catch (e) {
-						callback(e, {status: 'error', data: []});
+						console.log('Error during parsing ' + lang);
 					}
 					if(parsed) {
 						var entries = parsed.feed.entry;
 						result[lang] = parseLocalisationList(entries, lang);
-					} else {
-						console.log('Error during parsing ' + lang);
 					}
 					asyncCompleted();
 				});				
 			}, function(err) {
 				if(err) {
 					console.log(err);
-					callback(err, {status: 'error'});
+					return callback(err, {status: 'error'});
 				} else {
-					callback(null, {status: 'ok', data: result});
+					return callback(null, {status: 'ok', data: result});
 				}
 			});
 		} else {
-			callback(err, response);
+			return callback(err, response);
 		}
 	});
 }
@@ -178,23 +176,19 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) 
 GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(url, callback) {
 	request.get({url: url + '?alt=json', jwt: jwt}, function(err, response, body) {
 		if(!body) {
-			callback("Empty response", {status: 'error', data: []});
+			return callback("Empty response", {status: 'error', data: []});
 		}
 		var parsed;
 		try {
 			parsed = JSON.parse(body);
 		} catch (e) {
-			callback(e, []);
+			return callback("Can't parse worksheet", {status: 'error', data: []});
 		}
-		if(parsed) {
-			var langRegexp = /\((.*)\)/;
-			var lang = parsed.feed.title.$t.match(langRegexp);
-			var entries = parsed.feed.entry;
-			var result = parseLocalisationList(entries, lang[1]);
-			callback(null, {status: 'ok', data: result});
-		} else {
-			callback("Can't parse worksheet", {status: 'error', data: []});
-		}
+		var langRegexp = /\((.*)\)/;
+		var lang = parsed.feed.title.$t.match(langRegexp);
+		var entries = parsed.feed.entry;
+		var result = parseLocalisationList(entries, lang[1]);
+		return callback(null, {status: 'ok', data: result});
 	});	
 };
 
@@ -204,12 +198,12 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(key, callback) {
 	var url = this.root + '/worksheets/' + key + '/private/full?alt=json';
 	request.get({url: url, jwt: jwt}, function(err, response, body) {
 		if(!body) {
-			callback("Empty response", {status: 'error', data: []});
+			return callback("Empty response", {status: 'error', data: []});
 		}
 		try {
 			parsed = JSON.parse(body);
 		} catch (e) {
-			callback(e, {status: 'error', data: []});
+			return callback(e, {status: 'error', data: []});
 		}
 		if(parsed) {
 			var worksheets = parsed.feed.entry.slice(1);
@@ -223,7 +217,7 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(key, callback) {
 					link: link ? link.href : null
 				};
 			});
-			callback(null, {status: 'ok', data: result});
+			return callback(null, {status: 'ok', data: result});
 		}
 	});
 };

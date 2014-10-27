@@ -79,16 +79,19 @@ var app = app || {};
 		$('.worksheet.selected').click();
 	}
 
+	function applyFilters() {
+		hideAllTranslations();
+		getAllTranslationItemsByCurrentFilter().show();			
+	}
+
 	PageController.prototype.showOnlyModified = function() {
 		self.showModifiedOnly = $(this).is(':checked');
-		hideAllTranslations();
-		getAllTranslationItemsByCurrentFilter().show();
+		applyFilters();
 	};
 
 	PageController.prototype.showOnlyMissed = function() {
 		self.showMissedOnly  = $(this).is(':checked');
-		hideAllTranslations();
-		getAllTranslationItemsByCurrentFilter().show();		
+		applyFilters();		
 	};
 
 	PageController.prototype.searchByLanguages = function() {
@@ -232,7 +235,9 @@ var app = app || {};
 					data.editLink = response.data.editLink;
 					$translationItemContainer.data('item', data);
 					$translationItemContainer.toggleClass('changed', false);
+					$translationItemContainer.toggleClass('missed', data.translation === '');
 					$textContainer.data('default', $textContainer.text());
+					applyFilters();
 					alertify.success("Changes has been applied");
 				} else {
 					alertify.error(response.error);
