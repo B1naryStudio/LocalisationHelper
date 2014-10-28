@@ -7,6 +7,7 @@ var spreadsheetsHelper = require('./googleSpreadsheetsHelper');
 var fileSystemHelper = require('./fileSystemHelper');
 var dbHelper = require('./dbHelper');
 var auth = require('./authHelper');
+var basicAuth = require('basic-auth');
 var staticDir = __dirname + '/public';
 var spreadsheetKey = '1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s';
 
@@ -173,15 +174,13 @@ app.get('/zip', checkAuth, function(req, res) {
 	});
 });
 
-app.post('/zip', function(req, res) {
-	var user = {
-		name : req.body.name,
-		pass : req.body.pass
-	};
+app.get('/authzip', function(req, res) {
+	var user = basicAuth(req);
 	auth.signIn(user, function(err, result) {
 		if(err) {
 			console.log('Error while special zip generation. Seems credentials are not valid.');
-			res.json({error: err});
+			res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+			return res.status(401).end();
 		} else {
 			spreadsheetsHelper.getSpreadsheetData(spreadsheetKey, function(err, result) {
 				if(result.status === 'error') {
@@ -195,7 +194,7 @@ app.post('/zip', function(req, res) {
 				}
 			});
 		}
-	});	
+	});
 });
 
 app.get('/history', function(req, res) {
