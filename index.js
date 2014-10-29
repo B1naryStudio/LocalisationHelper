@@ -176,11 +176,14 @@ app.get('/zip', checkAuth, function(req, res) {
 
 app.get('/authzip', function(req, res) {
 	var user = basicAuth(req);
+	if(!user) {
+		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		return res.status(401).end();
+	}
 	auth.signIn(user, function(err, result) {
 		if(err) {
 			console.log('Error while special zip generation. Seems credentials are not valid.');
-			res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-			return res.status(401).end();
+			res.json({error: err});
 		} else {
 			spreadsheetsHelper.getSpreadsheetData(spreadsheetKey, function(err, result) {
 				if(result.status === 'error') {
