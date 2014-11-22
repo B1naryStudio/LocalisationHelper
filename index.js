@@ -21,6 +21,15 @@ app.set('view engine', 'jade');
 
 dbHelper.initialize(app.get('db-uri'));
 
+(function decorateLog() {
+	var originalLog = console.log;
+	console.log = function(log) {
+		var date = new Date();
+		var text = '[' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + '] ' + log;
+		originalLog(text);
+	}
+})();
+
 function checkAuth(req, res, next) {
 	if(!req.session.auth) {
 		return res.render('login.jade');
@@ -176,6 +185,10 @@ app.get('/zip', checkAuth, function(req, res) {
 
 app.get('/authzip', function(req, res) {
 	var user = basicAuth(req);
+	if(!user) {
+		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		return res.status(401).end();		
+	}
 	auth.signIn(user, function(err, result) {
 		if(err) {
 			console.log('Error while special zip generation. Seems credentials are not valid.');
