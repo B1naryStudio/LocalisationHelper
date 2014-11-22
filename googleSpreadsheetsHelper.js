@@ -267,6 +267,12 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(spreadsheetKey, 
 	});
 };
 
+/**
+ * Check whether spreadsheet keys are consistent across all worksheets
+ * @param  {String}   spreadsheetKey Spreadsheet Key
+ * @param  {Function} callback
+ * @return {Object} Object with inconsistent values
+ */
 GoogleSpreadsheetsHelper.prototype.checkSpredsheetConsistent = function(spreadsheetKey, callback) {
 	var self = this;
 	this.getAllSpreasheetKeys(spreadsheetKey, function(err, result) {
