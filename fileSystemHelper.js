@@ -16,6 +16,9 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 				'_' + time.getHours() + time.getMinutes() + time.getSeconds();
 	var root = __dirname + '/localisation/' + prefix;
 	async.eachObject(localisation, function(value, lang, done) {
+		var value = _.filter(value, function(it) {
+			return it.translation;
+		});
 		var vis = _.where(value, {project: 'VIS'});
 		var csb = _.where(value, {project: 'CSB'});
 		var visContent = {
