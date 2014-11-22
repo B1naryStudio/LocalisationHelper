@@ -267,4 +267,56 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(spreadsheetKey, 
 	});
 };
 
+GoogleSpreadsheetsHelper.prototype.checkSpredsheetConsistent = function(spreadsheetKey, callback) {
+	var self = this;
+	this.getAllSpreasheetKeys(spreadsheetKey, function(err, result) {
+		if(!err) {
+			var allKeys = result.data;
+			self.getSpreadsheetData(spreadsheetKey, function(err, result) {
+				var data = {};
+				_.each(result.data, function(value, lang) {
+					data[lang] = _.uniq(_.map(value, function(it){
+						return it.key;
+					}));
+				});
+				var consistency = {};
+				_.each(data, function(keys, lang) {
+					var difference = _.difference(allKeys, keys);
+					if(difference.length !== 0) {
+						consistency[lang] = difference;
+					}
+				});
+
+				callback(null, {status: 'ok', data: consistency});
+			});
+		} else {
+			callback(err, {status: 'error'});
+			console.log(err);
+		}
+	});
+};
+
+/**
+ * Returns unique union of all localisation keys
+ * @param  {String}   spreadsheetKey Spreadsheet Key
+ * @param  {Function} callback
+ * @return {Array}
+ */
+GoogleSpreadsheetsHelper.prototype.getAllSpreasheetKeys = function(spreadsheetKey, callback) {
+	this.getSpreadsheetData(spreadsheetKey, function(err, result) {
+		if(!err) {
+			var data = [];
+			_.each(result.data, function(value) {
+				data.push(_.map(value, function(it){
+					return it.key;
+				}));
+			});
+			var uniqueKeys = _.uniq(_.prototype.union.apply(this, data));
+			callback(null, {status: 'ok', data: uniqueKeys});
+		} else {
+			callback(err, {status: 'error', data: []});
+		}
+	});
+};
+
 module.exports = new GoogleSpreadsheetsHelper();

@@ -238,6 +238,16 @@ app.get('/diff', function(req, res) {
 	});
 });
 
+app.get('/consistency', function(req, res) {
+	spreadsheetsHelper.checkSpredsheetConsistent(spreadsheetKey, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err});
+		} else {
+			res.json(result);
+		}		
+	});
+});
+
 app.post('/newkey', function(req, res) {
 	var key = req.body.key;
 	if(key) {

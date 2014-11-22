@@ -38,6 +38,8 @@ html(lang="en")
 			if user.role == 'admin'
 				#change-spreadsheet(class="hint--right" data-hint="Change spreadsheet key")
 					i.fa.fa-repeat
+				#check-consistency(class="hint--right", data-hint="Check spreadsheet consistency")
+					i.fa.fa-check
 			#logout(class="hint--right" data-hint="Logout")
 				a(href="/logout") 
 					i.fa.fa-power-off
@@ -77,6 +79,13 @@ html(lang="en")
 						#diff-content
 						.close-button
 							i.fa.fa-close
+				li#consistency-form
+					div
+						#consistency-content.scrollBarInner
+						div#buttons-section
+							button#fix-inconsistency Fix this
+						.close-button
+							i.fa.fa-close
 
 		script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
 		script(type="text/javascript", src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js")
@@ -90,5 +99,6 @@ html(lang="en")
 		include templates/existed-localisations-template
 		include templates/history-translation-template
 		include templates/translation-item-template
+		include templates/consistency-template
 		include templates/worksheet-template
 		include templates/diff-template

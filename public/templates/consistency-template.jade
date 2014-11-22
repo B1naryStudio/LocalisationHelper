@@ -1,0 +1,8 @@
+script#consistency-template
+	#consistency-items
+		| {{each data}}
+		h4 ${$index}
+		| {{each $value}}
+		div ${$value}
+		| {{/each}}
+		| {{/each}}

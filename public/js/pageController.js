@@ -20,7 +20,9 @@ var app = app || {};
 			spreadsheetKey  : $('#sp-key-value'),
 			newLocalisation : $('#localisation-new'),
 			spreadsheetForm : $('#spreadsheet-form'),
+			consistencyForm : $('#consistency-form'),
 			locKey          : $('#localisation-key'),
+			consContent     : $('#consistency-content'),
 			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
@@ -29,6 +31,7 @@ var app = app || {};
 		this.$templates = {
 			diffTemplate            : $('#diff-template'),
 			worksheetsTemplate      : $('#worksheet-template'),
+			consistencyTemplate     : $('#consistency-template'),
 			translationItemTemplate : $('#translation-item-template'),
 			historyTemplate         : $('#history-translation-template'),
 			existedLocsTemplate     : $('#existed-localisations-template')
@@ -392,12 +395,31 @@ var app = app || {};
 		});		
 	};
 
+	PageController.prototype.checkConsistency = function() {
+		fadeScreen('spinner');
+		$.getJSON('/consistency', function(response) {
+			if(response.status === 'ok') {
+				self.$el.consContent.html('');
+				fadeScreen('consistencyForm');
+				if(_.isEmpty(response.data)) {
+					self.$el.consContent.html('No errors were found. Spreadsheet looks consistent.');
+				} else {
+					var template = self.$templates.consistencyTemplate;
+					self.$el.consContent.html(template.tmpl({data: response.data}));
+				}
+			} else {
+				self.$el.consContent.html(response.error);
+			}
+		});
+	};
+
 	PageController.prototype.bindListeners = function() {
 		$('#request-diff').click(this.getLocalisationDiff);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
 		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);
 		$('#localisation-missed-only').click(this.showOnlyMissed);
+		$('#check-consistency').click(this.checkConsistency);
 		$('#history').on('click', '.history-translation-item', this.setHistoryItem);
 		$('#history').on('click', '#close-button', this.closeHistoryPopup);
 		$('#worksheets').on('click', '.worksheet', this.getWorksheetsData);
