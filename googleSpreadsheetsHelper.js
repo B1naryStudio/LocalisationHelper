@@ -32,7 +32,11 @@ function parseLocalisationList(entries, lang) {
 	return result;
 };
 
-// updates existing localisation key
+/**
+ * Updates existing localisation key
+ * @param  {Object}   item Localisation Item
+ * @param  {Function} callback
+ */
 GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback) {
 	var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
 					'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
@@ -58,11 +62,19 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback)
 	});
 };
 
-// adds new localisation key to each lang (worksheet) in spreadsheet
-GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, callback) {
-	this.getWorksheetsInfo(key, function(err, response) {
+/**
+ * Adds new localisation key to each lang (worksheet) in spreadsheet
+ * @param {String}   spreadsheetKey Spreadsheet Key
+ * @param {Object}   item Localisation Item
+ * @param {Function} callback
+ */
+GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(spreadsheetKey, item, callback) {
+	var self = this;
+	var i = 0;
+	console.log('Initiated INSERT for key: ' + item.key);
+	this.getWorksheetsInfo(spreadsheetKey, function(err, response) {
 		if(response.status === 'ok') {
-			async.each(response.data, function(worksheet, asyncCompleted) {
+			async.eachSeries(response.data, function(worksheet, asyncCompleted) {
 				var data = '<entry xmlns="http://www.w3.org/2005/Atom" ' +
 								'xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">' +
 								'<gsx:context>' + item.context + '</gsx:context>' +
@@ -71,14 +83,23 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, call
 								'<gsx:project>' + item.project + '</gsx:project>' +
 								'<gsx:translation></gsx:translation>' +
 							'</entry>';
-				var url = worksheet.link;
+				var url = worksheet.link;				
 				request.post({url: url, jwt: jwt, headers: {'Content-Type' : 'application/atom+xml'}, body: data}, function(err, httpResponse, body) {
 					if(err) {
-						console.log(err);
+						asyncCompleted(err);
 					} else{
-						console.log('posted!');
-					}
-					asyncCompleted();
+						var xml = new XML(body);
+						var id = xml.child('id').getValue();
+						if(id && ++i < 5) {
+							console.log('New key added to ' + worksheet.lang);
+							console.log('New key\'s id: ' + id);
+							asyncCompleted();
+						} else {
+							asyncCompleted('Error while adding new key to ' + worksheet.lang);
+							console.log('Revert back inserts');
+							self.deleteLocalisation(key, item);
+						}
+					}					
 				});	
 			}, function(err) {
 				if(err) {
@@ -91,15 +112,22 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(key, item, call
 			});
 		} else {
 			return callback(err, response);
-		}
-		
+		}		
 	});
 };
 
+/**
+ * Removes given localisation from the spreadsheet
+ * @param  {String}   spreadsheetKey Spreadsheet Key
+ * @param  {Object}   item Localisation Item
+ * @param  {Function} callback
+ */
 GoogleSpreadsheetsHelper.prototype.deleteLocalisation = function(spreadsheetKey, item, callback) {
 	var self = this;
 	var translationKey = item.key;
 	var project = item.project;
+	var callback = callback || function() {};
+	console.log('Initiated DELETE for key: ' + translationKey);
 	this.getWorksheetsInfo(spreadsheetKey, function(err, response) {
 		if(response.status === 'ok') {
 			async.each(response.data, function(worksheet, asyncCompleted) {
@@ -110,14 +138,16 @@ GoogleSpreadsheetsHelper.prototype.deleteLocalisation = function(spreadsheetKey,
 						if(itemToDelete) {
 							request.del({url: itemToDelete.editLink, jwt: jwt, headers: {'Content-Type' : 'application/atom+xml'}}, function(err, httpResponse, body) {
 								if(err) {
-									console.log(err);
+									console.log('Error while removing key from ' + itemToDelete.lang + '. Reason: ' + err);
 								} else{
-									console.log('deleted from ' + itemToDelete.lang + ' lang!');
-								}							
-							});	
+									console.log('Deleted from ' + itemToDelete.lang + ' lang!');
+								}
+								asyncCompleted();						
+							});
+						} else {
+							asyncCompleted();
 						}
 					}
-					asyncCompleted();
 				});
 			}, function(err) {
 				if(err) {
@@ -134,10 +164,15 @@ GoogleSpreadsheetsHelper.prototype.deleteLocalisation = function(spreadsheetKey,
 	});	
 };
 
-// returns cell-based spreadsheets data divided by language using spreadsheet key
-GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) {
+/**
+ * Returns cell-based spreadsheets data divided by language using spreadsheet key
+ * @param  {String}   spreadsheetKey Spreadsheet Key
+ * @param  {Function} callback
+ * @return {Object} Object with lang:Array structure (in 'data' property). 
+ */
+GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(spreadsheetKey, callback) {
 	var result = {};
-	this.getWorksheetsInfo(key, function(err, response) {
+	this.getWorksheetsInfo(spreadsheetKey, function(err, response) {
 		if(response.status === 'ok') {
 			async.each(response.data, function(item, asyncCompleted) {
 				var url = item.link + '?alt=json';
@@ -172,7 +207,12 @@ GoogleSpreadsheetsHelper.prototype.getSpreadsheetData = function(key, callback) 
 	});
 }
 
-// Returns cell-based data from worksheet using worksheet url
+/**
+ * Returns cell-based data from worksheet using worksheet url
+ * @param  {String}   url Worksheet URL
+ * @param  {Function} callback
+ * @return {Array} Array of cells
+ */
 GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(url, callback) {
 	request.get({url: url + '?alt=json', jwt: jwt}, function(err, response, body) {
 		if(!body) {
@@ -192,10 +232,15 @@ GoogleSpreadsheetsHelper.prototype.getWorksheetData = function(url, callback) {
 	});	
 };
 
-// Returns worksheets information (name, lang, link) using spreadsheet key
-GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(key, callback) {
+/**
+ * Returns worksheets information (name, lang, link) using spreadsheetKey key
+ * @param  {String}   spreadsheetKey Spreadsheet Key
+ * @param  {Function} callback
+ * @return {Array} Array of worksheets
+ */
+GoogleSpreadsheetsHelper.prototype.getWorksheetsInfo = function(spreadsheetKey, callback) {
 	var self = this;
-	var url = this.root + '/worksheets/' + key + '/private/full?alt=json';
+	var url = this.root + '/worksheets/' + spreadsheetKey + '/private/full?alt=json';
 	request.get({url: url, jwt: jwt}, function(err, response, body) {
 		if(!body) {
 			return callback("Empty response", {status: 'error', data: []});

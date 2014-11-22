@@ -16,6 +16,11 @@ function mapUsers(users) {
 	});
 }
 
+/**
+ * Register user in a system
+ * @param  {Object}   user User Object
+ * @param  {Function} callback
+ */
 AuthHelper.prototype.register = function(user, callback) {
 	if(!user.name || !user.pass || !user.role) {
 		return callback("Please check your user info");		
@@ -37,6 +42,11 @@ AuthHelper.prototype.register = function(user, callback) {
 	});
 };
 
+/**
+ * Update user's data
+ * @param  {Object}   candidateUser
+ * @param  {Function} callback
+ */
 AuthHelper.prototype.updateUser = function(candidateUser, callback) {
 	if(!candidateUser.name || !candidateUser.pass || !candidateUser.role) {
 		return callback("Please check your user info");		
@@ -63,6 +73,11 @@ AuthHelper.prototype.updateUser = function(candidateUser, callback) {
 	});
 };
 
+/**
+ * Validates user's data
+ * @param  {Object}   user
+ * @param  {Function} callback
+ */
 AuthHelper.prototype.checkUser = function(user, callback) {
 	dbHelper.getUser(user, function(err, user) {
 		if(!user || err) {
@@ -72,6 +87,11 @@ AuthHelper.prototype.checkUser = function(user, callback) {
 	});
 };
 
+/**
+ * Signs in user in a system
+ * @param  {Object}   candidateUser User to sign in
+ * @param  {Function} callback
+ */
 AuthHelper.prototype.signIn = function(candidateUser, callback) {
 	dbHelper.getUser(candidateUser, function(err, user) {
 		if(!user || err) {
@@ -87,6 +107,11 @@ AuthHelper.prototype.signIn = function(candidateUser, callback) {
 	});
 };
 
+/**
+ * Get all user's data
+ * @param  {Function} callback
+ * @return {Array} List of users
+ */
 AuthHelper.prototype.getUsers = function(callback) {
 	dbHelper.getAllUsers(function(err, users) {
 		if(err) {

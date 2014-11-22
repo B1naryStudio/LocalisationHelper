@@ -18,6 +18,10 @@ function formatDates(docs) {
 	});
 }
 
+/**
+ * Performs DB initialisation
+ * @param  {String} uri DB uri to connect
+ */
 DbHelper.prototype.initialize = function(uri) {
 	var self = this;
 	mongo.connect(uri, function(err, db) {
@@ -29,6 +33,11 @@ DbHelper.prototype.initialize = function(uri) {
 	});
 };
 
+/**
+ * Creates new user
+ * @param  {Object}   user User's data 
+ * @param  {Function} callback
+ */
 DbHelper.prototype.createUser = function(user, callback) {
 	var self = this;
 	this.getUser(user, function(err, existedUser) {
@@ -45,6 +54,12 @@ DbHelper.prototype.createUser = function(user, callback) {
 	});
 };
 
+/**
+ * Get user's data
+ * @param  {Object}   user Object with user name
+ * @param  {Function} callback
+ * @return {Object}
+ */
 DbHelper.prototype.getUser = function(user, callback) {
 	this.db.collection('users').findOne({name: user.name}, function(err, user) {
 		if(!err && user) {
@@ -55,6 +70,11 @@ DbHelper.prototype.getUser = function(user, callback) {
 	});
 };
 
+/**
+ * Returns all users in the system
+ * @param  {Function} callback
+ * @return {Array} List of users
+ */
 DbHelper.prototype.getAllUsers = function(callback) {
 	this.db.collection('users')
 		.find({})
@@ -66,6 +86,12 @@ DbHelper.prototype.getAllUsers = function(callback) {
 		});
 };
 
+/**
+ * Updates user's data
+ * @param  {Object}   user User to be updated
+ * @param  {Function} callback Callback
+ * @return {Object}   Updated user
+ */
 DbHelper.prototype.updateUser = function(user, callback) {
 	this.db.collection('users').update({name: user.name}, user, function(err, user) {
 		if(!err && user) {
@@ -76,6 +102,10 @@ DbHelper.prototype.updateUser = function(user, callback) {
 	});
 };
 
+/**
+ * Inserts localisation records
+ * @param  {Array} records Localisation records to be inserted
+ */
 DbHelper.prototype.insertLocalisations = function(records) {
 	var localisation = this.db.collection('localisation');
 	for(var lang in records) {
@@ -83,7 +113,7 @@ DbHelper.prototype.insertLocalisations = function(records) {
 			item.createdAt = new Date();
 			localisation.insert(item, function(err, docs) {
 				if(err) {
-					console.log('err');
+					console.log('Error during insert localisations. Reason: ' + err);
 				}
 				asyncCompleted();
 			});
@@ -97,27 +127,37 @@ DbHelper.prototype.insertLocalisations = function(records) {
 	}
 };
 
-DbHelper.prototype.insertLocalisation = function(item) {
-	item.createdAt = new Date();
-	this.db.collection('localisation').insert(item, function(err, docs) {
-		console.log('wrote ' + JSON.stringify(item));
-	});
-};
-
+/**
+ * Allias for logTranslation for UPDATES
+ * @param  {Object} localisation Localisation object
+ */
 DbHelper.prototype.logTranslationUpdate = function(localisation) {
 	this.logTranslation(localisation, 'update');
 };
 
+/**
+ * Allias for logTranslation for DELETES
+ * @param  {Object} localisation Localisation object
+ */
 DbHelper.prototype.logTranslationDelete = function(localisation) {
 	this.logTranslation(localisation, 'delete');
 };
 
+/**
+ * Allias for logTranslation for INSERTS
+ * @param  {Object} localisation Localisation object
+ */
 DbHelper.prototype.logTranslationAdd = function(localisation) {
 	this.logTranslation(localisation, 'add');
 };
 
+
+/**
+ * Log localisation actions to the DB
+ * @param  {Object} localisation Localisation object
+ * @param  {String} type Type of log
+ */
 DbHelper.prototype.logTranslation = function(localisation, type) {
-	this.insertLocalisation(localisation);
 	localisation.dateTime = new Date();
 	localisation.type = type;
 	this.db.collection('diff').

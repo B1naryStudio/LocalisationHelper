@@ -10,6 +10,11 @@ function FileSystemHelper() {
 
 };
 
+/**
+ * Generates JSON files for current spreadsheet
+ * @param  {Object}   localisation Object with all localisation data
+ * @param  {Function} callback
+ */
 FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) {
 	var time = new Date();
 	var prefix = '' + time.getDate() + time.getMonth() + time.getFullYear() + 
