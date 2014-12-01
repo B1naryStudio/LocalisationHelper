@@ -35,11 +35,11 @@ html(lang="en")
 						i.fa.fa-file-archive-o
 				#get-diff(class="hint--right" data-hint="Get diff")
 					i.fa.fa-random
+				#check-consistency(class="hint--right", data-hint="Check spreadsheet consistency")
+					i.fa.fa-check
 			if user.role == 'admin'
 				#change-spreadsheet(class="hint--right" data-hint="Change spreadsheet key")
 					i.fa.fa-repeat
-				#check-consistency(class="hint--right", data-hint="Check spreadsheet consistency")
-					i.fa.fa-check
 			#logout(class="hint--right" data-hint="Logout")
 				a(href="/logout") 
 					i.fa.fa-power-off
