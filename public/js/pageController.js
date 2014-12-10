@@ -139,12 +139,29 @@ var app = app || {};
 		$.get('/localisation', {url: url}, function(response) {
 			if(response.status === 'ok') {
 				clearFade();
+				var helpMessageAdded = false;
 				alertify.success("Loaded " + item.html());
 				self.currentData = response.data;
 				self.currentData.forEach(function(item) {
 					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
 					if(!item.translation) {
 						$translationItem.toggleClass('missed', true);
+					}
+					if(!helpMessageAdded) {
+						var original = $translationItem.find('.translation-original');
+						var project = $translationItem.find('.translation-project');
+						var key = $translationItem.find('.translation-key');
+						var context = $translationItem.find('.translation-context');
+						var value = $translationItem.find('.translation-value');
+						original.attr('data-step', 2);
+						original.attr('data-intro', 'Original english value');
+						project.attr('data-step', 3);
+						project.attr('data-intro', 'Application name (relevant only for Devs)');
+						key.attr('data-step', 4);
+						key.attr('data-intro', 'Localisation key (relevant only for Devs)');						
+						value.attr('data-step', 5);
+						value.attr('data-intro', 'Translation for this key for current language. You can edit it');
+						helpMessageAdded = true;
 					}
 					container.append($translationItem);
 				});
@@ -165,6 +182,7 @@ var app = app || {};
 		$.get('/worksheets', {key: key}, function(response) {
 			if(response.status === 'ok') {
 				clearFade();
+				var helpMessageAdded = false;
 				alertify.success("Spreadsheet loaded");
 				var list = response.data;
 				var container = $('<div>').toggleClass('scrollBarInner', true);
@@ -172,6 +190,11 @@ var app = app || {};
 				self.$el.worksheets.html('');
 				list.forEach(function(item) {
 					var $worksheet = self.$templates.worksheetsTemplate.tmpl(item);
+					if(!helpMessageAdded) {
+						$worksheet.attr('data-step', 1);
+						$worksheet.attr('data-intro', 'First of all select the language you want to work with.');
+						helpMessageAdded = true;
+					}
 					container.append($worksheet);
 				});
 				self.$el.worksheets.append(container);
@@ -413,8 +436,13 @@ var app = app || {};
 		});
 	};
 
+	PageController.prototype.runIntro = function() {
+		introJs().start();
+	};
+
 	PageController.prototype.bindListeners = function() {
 		$('#request-diff').click(this.getLocalisationDiff);
+		$('#intro').click(this.runIntro);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
 		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);

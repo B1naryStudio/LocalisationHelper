@@ -8,6 +8,8 @@ html(lang="en")
 		link(rel="stylesheet", href="css/datetime.css")
 		link(rel="stylesheet", href="css/hint.min.css")
 		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
+		link(rel="stylesheet", href="css/introjs.min.css")
+		link(rel="stylesheet", href="css/introjs-nassim.css")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:700,400', type='text/css')
 	body
 		#container.visible
@@ -40,6 +42,8 @@ html(lang="en")
 			if user.role == 'admin'
 				#change-spreadsheet(class="hint--right" data-hint="Change spreadsheet key")
 					i.fa.fa-repeat
+			#intro(class="hint--right", data-hint="Introduction")
+				i.fa.fa-question
 			#logout(class="hint--right" data-hint="Logout")
 				a(href="/logout") 
 					i.fa.fa-power-off
@@ -94,6 +98,7 @@ html(lang="en")
 		script(type="text/javascript", src="lib/alertify.js")
 		script(type="text/javascript", src="lib/datetime.js")
 		script(type="text/javascript", src="lib/jdatetime.js")
+		script(type="text/javascript", src="lib/intro.min.js")
 		script(type="text/javascript", src="js/pageController.js")
 		script(type="text/javascript", src="js/main.js")
 		include templates/existed-localisations-template
