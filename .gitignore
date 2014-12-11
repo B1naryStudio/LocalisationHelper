@@ -1,5 +1,5 @@
 # Localisations
-/localisation/**/*.json
+/helpers/localisation/**/*.json
 
 #private keys
 *.pem
