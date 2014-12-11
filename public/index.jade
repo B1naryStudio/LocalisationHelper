@@ -13,38 +13,54 @@ html(lang="en")
 		link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:700,400', type='text/css')
 	body
 		#container.visible
-			#data-controls-panel
+			#data-controls-panel(data-step="9" data-intro="Filters section can help you to find the key or language which you want.")
 				#language-controls
-					input#language-search(type='text', placeholder="Search by language")
+					input#language-search(type='text', placeholder="Search by language", data-step="10" data-intro="Filter by languages")
 				#localisation-controls
-					input#localisation-search(type='text', placeholder="Search by translations, keys...")
-					label(for='localisation-changed-only') Show changed only
-					input#localisation-changed-only(type='checkbox')
-					label(for='localisation-missed-only') Show missed only
-					input#localisation-missed-only(type='checkbox')
-			#worksheets.scrollBarBox
-			#data.scrollBarBox
+					.controls-wrapper
+						div(data-step="11" data-intro="Filter by keys, translations, values.")
+							input#localisation-search(type='text', placeholder="Search by translations, keys...")
+						div(data-step="12" data-intro="Show only the keys which were changed")
+							label(for='localisation-changed-only') Show changed only
+							input#localisation-changed-only(type='checkbox')
+						div(data-step="13" data-intro="Show only the keys where translation is missed")
+							label(for='localisation-missed-only') Show missed only
+							input#localisation-missed-only(type='checkbox')
+					#apply-all-button(data-step="14" data-intro="After you've edit few items you can click this button and apply all the changes")
+						i.fa.fa-check-square-o
+						|Apply All
+			#worksheets.scrollBarBox(data-step="1", data-intro="Here you can select the language you want to work with", data-position="right")
+			#data.scrollBarBox(data-step="2", data-intro="You will see the list of localisation keys here", data-position="left")
 		#left-button-section
 			if user.role == 'admin'
-				#users(class="hint--right" data-hint="Manage users")
+				#users(class="menu-icon hint--right" data-hint="Manage users")
 					a(href="/accounts")
 						i.fa.fa-users
 			if user.role == 'admin' || user.role == 'developer'	
-				#create-new-localisation(class="hint--right" data-hint="New Key")
+				#create-new-localisation(class="menu-icon hint--right" data-hint="New Key")
 					i.fa.fa-plus
-				#create-zip(class="hint--right" data-hint="Create zip")
+				#text-tranformations(class="menu-icon")
+					i.fa.fa-text-height
+					#text-tranformations-tooltip
+						#text-tranformations-upper(class="menu-icon hint--top" data-hint="Convert text to Upper Case")
+							i.fa.fa-arrow-up
+						#text-tranformations-camel(class="menu-icon hint--top" data-hint="Convert text to Camel Case")
+							i.fa.fa-font
+						#text-tranformations-lower(class="menu-icon hint--top" data-hint="Convert text to Lower Case")
+							i.fa.fa-arrow-down
+				#create-zip(class="menu-icon hint--right" data-hint="Create zip")
 					a(href="/zip")
 						i.fa.fa-file-archive-o
-				#get-diff(class="hint--right" data-hint="Get diff")
+				#get-diff(class="menu-icon hint--right" data-hint="Get diff")
 					i.fa.fa-random
-				#check-consistency(class="hint--right", data-hint="Check spreadsheet consistency")
+				#check-consistency(class="menu-icon hint--right", data-hint="Check spreadsheet consistency")
 					i.fa.fa-check
 			if user.role == 'admin'
-				#change-spreadsheet(class="hint--right" data-hint="Change spreadsheet key")
+				#change-spreadsheet(class="menu-icon hint--right" data-hint="Change spreadsheet key")
 					i.fa.fa-repeat
-			#intro(class="hint--right", data-hint="Introduction")
+			#intro(class="menu-icon hint--right", data-hint="Introduction")
 				i.fa.fa-question
-			#logout(class="hint--right" data-hint="Logout")
+			#logout(class="menu-icon hint--right" data-hint="Logout")
 				a(href="/logout") 
 					i.fa.fa-power-off
 		#popup

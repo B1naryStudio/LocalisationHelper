@@ -62,6 +62,19 @@ GoogleSpreadsheetsHelper.prototype.updateLocalisation = function(item, callback)
 	});
 };
 
+GoogleSpreadsheetsHelper.prototype.multiUpdateLocalications = function(items, callback) {
+	var self = this;
+	async.each(items, function(item, asyncCallback) {
+		self.updateLocalisation(item, asyncCallback);
+	}, function(err) {
+		if(err) {
+			console.log(err);
+			return callback(err, {status: 'error'});
+		} 
+		return callback(null, {status: 'ok'});
+	});
+};
+
 /**
  * Adds new localisation key to each lang (worksheet) in spreadsheet
  * @param {String}   spreadsheetKey Spreadsheet Key

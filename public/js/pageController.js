@@ -26,7 +26,8 @@ var app = app || {};
 			leftMenu        : $('#left-button-section'),
 			locProject      : $('#localisation-project'),
 			locContext      : $('#localisation-context'),
-			locOriginal     : $('#localisation-original')
+			locOriginal     : $('#localisation-original'),
+			tranformTooltip : $('#text-tranformations-tooltip')
 		};
 		this.$templates = {
 			diffTemplate            : $('#diff-template'),
@@ -41,7 +42,7 @@ var app = app || {};
 		this.showMissedOnly = false;
 		this.bindListeners();
 		this.loadSpreadsheet();
-		this.currentData = [];
+		this.currentData = [];		
 	};
 
 	function getAllTranslationItemsByCurrentFilter() {
@@ -85,6 +86,11 @@ var app = app || {};
 	function applyFilters() {
 		hideAllTranslations();
 		getAllTranslationItemsByCurrentFilter().show();			
+	}
+
+	function toTitleCase(str)
+	{
+		return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 	}
 
 	PageController.prototype.showOnlyModified = function() {
@@ -153,14 +159,18 @@ var app = app || {};
 						var key = $translationItem.find('.translation-key');
 						var context = $translationItem.find('.translation-context');
 						var value = $translationItem.find('.translation-value');
-						original.attr('data-step', 2);
-						original.attr('data-intro', 'Original english value');
-						project.attr('data-step', 3);
+						$translationItem.attr('data-step', 3);
+						$translationItem.attr('data-intro', 'This is translation item. It consist of several components.'); 
+						original.attr('data-step', 4);
+						original.attr('data-intro', 'Original english value (which have to be translated)');
+						project.attr('data-step', 5);
 						project.attr('data-intro', 'Application name (relevant only for Devs)');
-						key.attr('data-step', 4);
+						key.attr('data-step', 6);
 						key.attr('data-intro', 'Localisation key (relevant only for Devs)');						
-						value.attr('data-step', 5);
+						value.attr('data-step', 7);
 						value.attr('data-intro', 'Translation for this key for current language. You can edit it');
+						context.attr('data-step', 8);
+						context.attr('data-intro', 'Context where this translation is used (can be empty)');
 						helpMessageAdded = true;
 					}
 					container.append($translationItem);
@@ -182,7 +192,6 @@ var app = app || {};
 		$.get('/worksheets', {key: key}, function(response) {
 			if(response.status === 'ok') {
 				clearFade();
-				var helpMessageAdded = false;
 				alertify.success("Spreadsheet loaded");
 				var list = response.data;
 				var container = $('<div>').toggleClass('scrollBarInner', true);
@@ -190,14 +199,10 @@ var app = app || {};
 				self.$el.worksheets.html('');
 				list.forEach(function(item) {
 					var $worksheet = self.$templates.worksheetsTemplate.tmpl(item);
-					if(!helpMessageAdded) {
-						$worksheet.attr('data-step', 1);
-						$worksheet.attr('data-intro', 'First of all select the language you want to work with.');
-						helpMessageAdded = true;
-					}
 					container.append($worksheet);
 				});
 				self.$el.worksheets.append(container);
+				$('.worksheet:first').click();
 			} else {
 				alertify.error(response.error);
 				console.log(response.error);
@@ -275,6 +280,41 @@ var app = app || {};
 				alertify.error(err);
 				console.log(err);
 				clearFade();
+			}
+		});
+	};
+
+	PageController.prototype.applyAllTranslationChanges = function() {
+		fadeScreen('spinner');
+		var changedItems = $('.translation-item.changed');
+		var items = _.map(changedItems, function(it) {
+			it = $(it);
+			var $textContainer = it.find('.translation-value-text');
+			var data = it.data('item');
+			data.previousTranslation = data.translation;
+			data.translation = $textContainer.text();
+			return data;
+		});
+		$.ajax({
+			url: '/localisation/multi',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify({items: items}),
+			success: function(response) {
+				if(response.status === 'ok') {					
+					alertify.success("Changes has been applied");
+				} else {
+					alertify.error(response.error);
+					console.log(response.error);
+				}
+				clearFade();
+				updateCurrentWorksheet();
+			},
+			error: function(err) {
+				alertify.error(err);
+				console.log(err);
+				clearFade();
+				updateCurrentWorksheet();
 			}
 		});
 	};
@@ -440,9 +480,47 @@ var app = app || {};
 		introJs().start();
 	};
 
+	PageController.prototype.convertToUpper = function() {
+		if(!self.currentData.length) {
+			return alertify.log("Please load any language before test transformation");
+		}
+
+		$('.translation-value-text').each(function(index, item) {
+			item = $(item);
+			var text = item.text().toUpperCase();
+			item.text(text);
+			PageController.prototype.onTranslationTextChanged.call(item);
+		});
+	};
+	PageController.prototype.convertToLower = function() {
+		if(!self.currentData.length) {
+			return alertify.log("Please load any language before test transformation");
+		}
+
+		$('.translation-value-text').each(function(index, item) {
+			item = $(item);
+			var text = item.text().toLowerCase();
+			item.text(text);
+			PageController.prototype.onTranslationTextChanged.call(item);
+		});
+	};
+	PageController.prototype.convertToCamel = function() {
+		if(!self.currentData.length) {
+			return alertify.log("Please load any language before test transformation");
+		}
+
+		$('.translation-value-text').each(function(index, item) {
+			item = $(item);
+			var text = toTitleCase(item.text());
+			item.text(text);
+			PageController.prototype.onTranslationTextChanged.call(item);
+		});
+	};
+
 	PageController.prototype.bindListeners = function() {
 		$('#request-diff').click(this.getLocalisationDiff);
 		$('#intro').click(this.runIntro);
+		$('#apply-all-button').click(this.applyAllTranslationChanges);
 		$('#create-new-localisation').click(this.openCreateNewKeyDialog);
 		$('#localisation-new-ok').click(this.addNewKey);
 		$('#localisation-changed-only').click(this.showOnlyModified);
@@ -468,6 +546,15 @@ var app = app || {};
 			fadeScreen('diff');
 			self.$el.diffContent.html('');
 		});
+		$('#text-tranformations').mouseover(function() {
+			self.$el.tranformTooltip.fadeIn();
+		});
+		$('#text-tranformations').mouseleave(function() {
+			self.$el.tranformTooltip.fadeOut();
+		});
+		$('#text-tranformations-upper').click(this.convertToUpper);
+		$('#text-tranformations-lower').click(this.convertToLower);
+		$('#text-tranformations-camel').click(this.convertToCamel);
 		$('.close-button').click(function() {
 			clearFade();
 		});

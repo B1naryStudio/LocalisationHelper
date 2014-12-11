@@ -13,8 +13,8 @@ var spreadsheetKey = '1LhZbstNbIyPyzwMSJyZyAmWPwtw0Uwg5aSPUaAu370s';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 50000 }))
+app.use(bodyParser.json({limit: '50mb', parameterLimit: 5000}))
 app.use(session({secret: 'localisation secret'}))
 app.set('views', staticDir);
 app.set('view engine', 'jade');
@@ -137,6 +137,17 @@ app.get('/localisation', function(req, res) {
 app.put('/localisation', function(req, res) {
 	var item = req.body.item;
 	spreadsheetsHelper.updateLocalisation(item, function(err, result) {
+		if(result.status === 'error') {
+			res.json({error: err});
+		} else {
+			res.json(result);
+		}
+	});
+});
+
+app.post('/localisation/multi', function(req, res) {
+	var items = req.body.items;
+	spreadsheetsHelper.multiUpdateLocalications(items, function(err, result) {
 		if(result.status === 'error') {
 			res.json({error: err});
 		} else {

@@ -188,6 +188,19 @@ input
 		margin 0 1.5rem
 	label
 		font-size 12px
+	.controls-wrapper
+		float left
+		width 90%
+		overflow hidden
+		> div
+			float left
+	#apply-all-button
+		width 10%
+		float left
+		cursor pointer
+		text-align center
+		&:hover
+			background #e5e4e4
 
 #left-button-section
 	position absolute
@@ -198,9 +211,10 @@ input
 	width 66px
 	background #eee
 	display none
+	z-index 10
 	&:hover
 		background #E5E4E4	
-	> div
+	.menu-icon
 		display block
 		width 50px
 		height 50px
@@ -219,6 +233,21 @@ input
 		&:hover
 			background #a5a5a5
 			font-size 25px
+	#text-tranformations
+		position relative
+		#text-tranformations-tooltip
+			position absolute
+			width 260px
+			left -4px
+			top -4px
+			background #e5e4e4
+			z-index 0
+			#text-tranformations-upper,
+			#text-tranformations-lower,
+			#text-tranformations-camel
+				float left
+			#text-tranformations-upper
+				margin-left 66px
 
 #sp-key
 	width 300px
@@ -510,6 +539,9 @@ input
 		box-shadow: 0em -3em 0em 0em #ffffff, 2em -2em 0 -0.5em #ffffff, 3em 0em 0 -0.5em #ffffff, 2em 2em 0 -0.5em #ffffff, 0em 3em 0 -0.5em #ffffff, -2em 2em 0 0em #ffffff, -3em 0em 0 0em #ffffff, -2em -2em 0 0.2em #ffffff
 	}
 }
+
+#text-tranformations-tooltip
+	display none
 
 /// Admin page ///
 

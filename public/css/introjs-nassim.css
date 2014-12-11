@@ -42,8 +42,8 @@
 
 .introjs-helperNumberLayer {
   position: absolute;
-  top: -16px;
-  left: -9px;
+  top: -27px;
+  left: -7px;
   z-index: 9999999999 !important;
   padding: 2px;
   font-family: Arial, verdana, tahoma;
