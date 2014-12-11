@@ -83,7 +83,6 @@ GoogleSpreadsheetsHelper.prototype.multiUpdateLocalications = function(items, ca
  */
 GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(spreadsheetKey, item, callback) {
 	var self = this;
-	var i = 0;
 	console.log('Initiated INSERT for key: ' + item.key);
 	this.getWorksheetsInfo(spreadsheetKey, function(err, response) {
 		if(response.status === 'ok') {
@@ -103,14 +102,14 @@ GoogleSpreadsheetsHelper.prototype.addNewLocalisation = function(spreadsheetKey,
 					} else{
 						var xml = new XML(body);
 						var id = xml.child('id').getValue();
-						if(id && ++i < 5) {
+						if(id) {
 							console.log('New key added to ' + worksheet.lang);
 							console.log('New key\'s id: ' + id);
 							asyncCompleted();
 						} else {
 							asyncCompleted('Error while adding new key to ' + worksheet.lang);
 							console.log('Revert back inserts');
-							self.deleteLocalisation(key, item);
+							self.deleteLocalisation(spreadsheetKey, item);
 						}
 					}					
 				});	
