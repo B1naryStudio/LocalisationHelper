@@ -53,7 +53,7 @@ FileSystemHelper.prototype.generateJsonFiles = function(localisation, callback) 
 			var parsedKey = item.key.split('->');
 			var section = '';
 			var sport = '';
-			var key = parsedKey[2];
+			var key = parsedKey.splice(2).join('->');
 			if(parsedKey[1] === 'STR') {
 				section = 'strings';
 			} else if(parsedKey[1] === 'CODES') {
