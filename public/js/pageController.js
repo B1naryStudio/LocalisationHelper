@@ -101,13 +101,9 @@ var app = app || {};
 			self.$el.data.append(counter);
 		}
 	}
-	
-	function limitLength(item, limit) {
-		item.on('keyup', function() {
-			var it = $(this);
-			it.text(it.text.substr(0, limit));
-		});
-	}
+	var alertUserAboutLimit = _.throttle(function (limit) {
+		alertify.error("Maximum translation length for this key is: " + limit);
+	}, 5000);
 
 	PageController.prototype.showOnlyModified = function() {
 		self.showModifiedOnly = $(this).is(':checked');
@@ -166,12 +162,12 @@ var app = app || {};
 				alertify.success("Loaded " + item.html());
 				self.currentData = response.data;
 				self.currentData.forEach(function(item) {
-					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
 					if(limitRegexp.test(item.context)) {
-						var limit = limitRegexp.exec(item.context)[1];
-						var $translationValue = $translationItem.find('.translation-value');
-						limitLength($translationValue, limit);
+						var parsedContext = limitRegexp.exec(item.context);
+						item.limit = parsedContext[1];
+						item.context = item.context.replace(parsedContext[0], '');
 					}
+					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
 					if(!item.translation) {
 						$translationItem.toggleClass('missed', true);
 					}
@@ -357,6 +353,12 @@ var app = app || {};
 		var $textContainer = $(this);
 		var $translationItemContainer = $textContainer.closest('.translation-item');
 		var defaultValue = $textContainer.data('default');
+		var limit = $translationItemContainer.data('item').limit;
+		if(limit) {
+			alertUserAboutLimit(limit);
+			$textContainer.text($textContainer.text().substr(0, limit));
+			$textContainer.focusEnd();
+		}
 		var isChanged = defaultValue !== $textContainer.text();
 		$translationItemContainer.toggleClass('changed', isChanged);
 		calculateModifiedCount();
