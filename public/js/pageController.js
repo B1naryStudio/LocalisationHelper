@@ -93,6 +93,15 @@ var app = app || {};
 		return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 	}
 
+	function calculateModifiedCount() {
+		$('#modified-counter').remove();
+		var count = $('.translation-item.changed').length;
+		if(count) {
+			var counter = $('<div id="modified-counter">Modified ' + count + ' item(s)</div>');
+			self.$el.data.append(counter);
+		}
+	}
+
 	PageController.prototype.showOnlyModified = function() {
 		self.showModifiedOnly = $(this).is(':checked');
 		applyFilters();
@@ -275,11 +284,13 @@ var app = app || {};
 					console.log(response.error);
 				}
 				clearFade();
+				calculateModifiedCount();
 			},
 			error: function(err) {
 				alertify.error(err);
 				console.log(err);
 				clearFade();
+				calculateModifiedCount();
 			}
 		});
 	};
@@ -326,6 +337,7 @@ var app = app || {};
 		$translationItemContainer.toggleClass('changed', false);
 		$textContainer.text(defaultText);
 		alertify.log("Canceled changes");
+		calculateModifiedCount();
 	};
 
 	PageController.prototype.onTranslationTextChanged = function() {
@@ -334,6 +346,7 @@ var app = app || {};
 		var defaultValue = $textContainer.data('default');
 		var isChanged = defaultValue !== $textContainer.text();
 		$translationItemContainer.toggleClass('changed', isChanged);
+		calculateModifiedCount();
 	};
 
 	PageController.prototype.openCreateNewKeyDialog = function() {

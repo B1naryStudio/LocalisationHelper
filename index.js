@@ -9,9 +9,9 @@ var staticDir = __dirname + '/public';
 
 app.set('db-uri', 'mongodb://localhost:27017/localisation');
 app.use(express.static(staticDir));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 50000 }))
-app.use(bodyParser.json({limit: '50mb', parameterLimit: 5000}))
-app.use(session({secret: 'localisation secret'}))
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 50000 }));
+app.use(bodyParser.json({limit: '50mb', parameterLimit: 5000}));
+app.use(session({secret: 'localisation secret', resave: true, saveUninitialized: true}));
 app.set('views', staticDir);
 app.set('view engine', 'jade');
 
