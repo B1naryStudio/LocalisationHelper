@@ -101,6 +101,13 @@ var app = app || {};
 			self.$el.data.append(counter);
 		}
 	}
+	
+	function limitLength(item, limit) {
+		item.on('keyup', function() {
+			var it = $(this);
+			it.text(it.text.substr(0, limit));
+		});
+	}
 
 	PageController.prototype.showOnlyModified = function() {
 		self.showModifiedOnly = $(this).is(':checked');
@@ -147,6 +154,7 @@ var app = app || {};
 	PageController.prototype.getWorksheetsData = function() {
 		fadeScreen('spinner');
 		var item = $(this);
+		var limitRegexp = /\[(\d+)\]/;
 		var url = item.find('.worksheet-url').html();
 		var container = $('<div>').attr('id', 'translation-content').toggleClass('scrollBarInner', true);
 		$('.worksheet.selected').toggleClass('selected', false);
@@ -159,6 +167,11 @@ var app = app || {};
 				self.currentData = response.data;
 				self.currentData.forEach(function(item) {
 					var $translationItem = self.$templates.translationItemTemplate.tmpl(item);
+					if(limitRegexp.test(item.context)) {
+						var limit = limitRegexp.exec(item.context)[1];
+						var $translationValue = $translationItem.find('.translation-value');
+						limitLength($translationValue, limit);
+					}
 					if(!item.translation) {
 						$translationItem.toggleClass('missed', true);
 					}
